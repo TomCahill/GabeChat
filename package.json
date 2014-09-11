@@ -1,0 +1,11 @@
+{
+  "name": "nodeChat",
+  "description": "",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "express": "*",
+    "node-uuid": "^1.4.1",
+    "socket.io": "*"
+  }
+}

@@ -1,0 +1,54 @@
+<html>
+	<head>
+		<title>nodeChat</title>
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/layout.css">
+		<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+		<script src="/socket.io/socket.io.js"></script>
+	</head>
+	<body>
+		<div class="chat-wrapper">
+			<div class="chat-window">
+				<ul>
+				</ul>
+			</div>
+			<div class="chat-input">
+				<form class="chat-input-wrapper">
+					<input type="text" />
+				</form>
+			</div>
+		</div>
+		<script type="text/javascript">
+			jQuery(function($){
+				$(window).resize(function(){
+					$('chat-wrapper .chat-window').css('height',$('chat-wrapper .chat-input').height()+'px');
+				});
+				$(window).resize();
+
+				var socket = io();
+				$('.chat-input-wrapper').submit(function(){
+					socket.emit('msg',$('.chat-input-wrapper input').val());
+					$('.chat-input-wrapper input').val('');
+					return false;
+				});
+				socket.on('msg', function(data){
+					addStatus(data);
+				});
+
+				function addStatus(data){
+					var time = new Date(data.time),
+						h=(time.getHours()<10) ? '0'+time.getHours() : time.getHours(),
+						m=(time.getMinutes()<10) ? '0'+time.getMinutes() : time.getMinutes(),
+						s=(time.getSeconds()<10) ? '0'+time.getSeconds() : time.getSeconds();
+
+					$('.chat-window ul').append('<li>'+
+						'<span class="time">'+h+':'+m+':'+s+'</span>'+
+						'<span class="from">'+data.user+'</span>'+
+						'<span class="text">'+data.msg+'</span>'+
+					'</li>');
+				}
+
+			});
+		</script>
+	</body>
+</html>

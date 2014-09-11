@@ -1,0 +1,74 @@
+html,body{
+	height: 100%;
+	overflow: hidden;
+}
+body{
+	font: 13px Consolas, Menlo, Monaco, "Lucida Console", "Liberation Mono", "DejaVu Sans Mono", "Courier New", monospace;
+}
+
+.chat-wrapper{
+	height: 100%;
+	overflow: hidden;
+}
+
+.chat-wrapper .chat-window{
+	overflow-y: scroll;
+	-webkit-overflow-scrolling:touch;
+	height: 100%;
+}
+.chat-wrapper .chat-window ul{
+	margin: 0px;
+	padding: 0px;
+}
+.chat-wrapper .chat-window ul li{
+	display: table-row;
+	word-wrap: break-word;
+}
+.chat-wrapper .chat-window ul li span{
+	display: table-cell;
+	padding: 3px 0;
+	vertical-align: top;
+}
+.chat-wrapper .chat-window ul li .time{
+	color: #d0dbe2;
+	text-align: right;
+	width: 46px;
+	min-width: 46px;
+}
+.chat-wrapper .chat-window ul li .from{
+	border-right: 1px solid #f6f6f6;
+	color: #84ce88;
+	padding-right: 10px;
+	text-align: right;
+	width: 134px;
+	min-width: 134px;
+}
+.chat-wrapper .chat-window ul li .text{
+	padding-left: 10px;
+	padding-right: 6px;
+}
+
+
+.chat-wrapper .chat-input{
+	background: #e4eaee;
+	border-top: 1px solid #cfdae1;
+	bottom: 0;
+	height: 45px;
+	left: 0;
+	position: absolute;
+	right: 0px;
+	z-index: 1;
+}
+.chat-wrapper .chat-input .chat-input-wrapper{
+	padding: 5px;
+}
+.chat-wrapper .chat-input input{
+	border: 1px solid #cfdae1;
+	font: 13px Consolas, monospace;
+	border-radius: 2px;
+	height: 35px;
+	outline: none;
+	padding: 0 12px;
+	-webkit-appearance: none;
+	width: 100%;
+}
