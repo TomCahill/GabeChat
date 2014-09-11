@@ -21,7 +21,8 @@
 		<script type="text/javascript">
 			jQuery(function($){
 				$(window).resize(function(){
-					$('chat-wrapper .chat-window').css('height',$('chat-wrapper .chat-input').height()+'px');
+					var h = $(window).height()-($('.chat-wrapper .chat-header').outerHeight()+$('.chat-wrapper .chat-input').outerHeight());
+					$('.chat-wrapper .chat-window').css('height',h+'px');
 				});
 				$(window).resize();
 
@@ -41,7 +42,7 @@
 						m=(time.getMinutes()<10) ? '0'+time.getMinutes() : time.getMinutes(),
 						s=(time.getSeconds()<10) ? '0'+time.getSeconds() : time.getSeconds();
 
-					$('.chat-window ul').append('<li>'+
+					$('.chat-window ul').append('<li class="'+data.type+'">'+
 						'<span class="time">'+h+':'+m+':'+s+'</span>'+
 						'<span class="from">'+data.user+'</span>'+
 						'<span class="text">'+data.msg+'</span>'+

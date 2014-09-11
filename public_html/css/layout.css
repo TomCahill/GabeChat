@@ -38,20 +38,26 @@ body{
 .chat-wrapper .chat-window ul li .from{
 	border-right: 1px solid #f6f6f6;
 	color: #84ce88;
-	padding-right: 10px;
+	padding: 0px 10px;
 	text-align: right;
 	width: 134px;
 	min-width: 134px;
+	max-width: 150px;
 }
 .chat-wrapper .chat-window ul li .text{
 	padding-left: 10px;
 	padding-right: 6px;
 }
 
+.chat-wrapper .chat-window ul li.status .from{
+	color:#838383;
+}
+
+
 
 .chat-wrapper .chat-input{
-	background: #e4eaee;
-	border-top: 1px solid #cfdae1;
+	background: #4C6372;
+	border-top: 1px solid #030E14;
 	bottom: 0;
 	height: 45px;
 	left: 0;
