@@ -21,6 +21,7 @@
 				</form>
 			</div>
 		</div>
+		<audio id="chatNotification" src="audio/notification.wav" preload="auto"></audio>
 		<script type="text/javascript">
 			jQuery(function($){
 				var appTitle = 'Lambda', isFocused = true, lostFocusCount = 0;
@@ -53,6 +54,8 @@
 						switchFav('fav2');
 						lostFocusCount++;
 						updateTitleCount(lostFocusCount);
+						document.getElementById('chatNotification').pause();
+						document.getElementById('chatNotification').play();
 					}
 
 					addStatus(data);

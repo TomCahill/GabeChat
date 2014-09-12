@@ -34,6 +34,7 @@ var Chat = function(){
 			users[user.key] = user;
 		},
 		disconnectUser: function(user){
+			delete users[user.key];
 			this.broadcastMsg(this.buildMsg('server','status', user.nick+' Disconnect'));
 		},
 		broadcastMsg: function(object){
