@@ -1,10 +1,13 @@
 <html>
 	<head>
-		<title>nodeChat</title>
+		<title>Lambda (0)</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 		<link rel="stylesheet" href="css/bootstrap.min.css">
 		<link rel="stylesheet" href="css/layout.css">
 		<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
 		<script src="/socket.io/socket.io.js"></script>
+
+		<link rel="shortcut icon" id="fav" href="images/fav1.jpg">
 	</head>
 	<body>
 		<div class="chat-wrapper">
@@ -20,11 +23,24 @@
 		</div>
 		<script type="text/javascript">
 			jQuery(function($){
+				var appTitle = 'Lambda', isFocused = true, lostFocusCount = 0;
+
 				$(window).resize(function(){
-					var h = $(window).height()-($('.chat-wrapper .chat-header').outerHeight()+$('.chat-wrapper .chat-input').outerHeight());
+					var h = $(window).outerHeight()-($('.chat-wrapper .chat-header').outerHeight()+$('.chat-wrapper .chat-input').outerHeight());
 					$('.chat-wrapper .chat-window').css('height',h+'px');
 				});
 				$(window).resize();
+
+				$(window).focus(function(){
+					isFocused = true;
+					switchFav('fav1');
+					lostFocusCount=0;
+					updateTitleCount(lostFocusCount);
+				});
+				$(window).blur(function(){
+					isFocused = false;
+				});
+
 
 				var socket = io();
 				$('.chat-input-wrapper').submit(function(){
@@ -33,20 +49,40 @@
 					return false;
 				});
 				socket.on('msg', function(data){
+					if(!isFocused){
+						switchFav('fav2');
+						lostFocusCount++;
+						updateTitleCount(lostFocusCount);
+					}
+
 					addStatus(data);
 				});
 
+				function updateTitleCount(int){
+					$('head title').text(appTitle+' ('+int+')');
+				}
+				function switchFav(fav){
+					$('#fav').attr('href','images/'+fav+'.jpg');
+				}
 				function addStatus(data){
 					var time = new Date(data.time),
 						h=(time.getHours()<10) ? '0'+time.getHours() : time.getHours(),
 						m=(time.getMinutes()<10) ? '0'+time.getMinutes() : time.getMinutes(),
-						s=(time.getSeconds()<10) ? '0'+time.getSeconds() : time.getSeconds();
+						s=(time.getSeconds()<10) ? '0'+time.getSeconds() : time.getSeconds(),
+						lockBottom = false;
+
+					if($('.chat-window ul').height()-$('.chat-window').scrollTop()>=$('.chat-window').height()){
+						lockBottom = true;
+					}
 
 					$('.chat-window ul').append('<li class="'+data.type+'">'+
 						'<span class="time">'+h+':'+m+':'+s+'</span>'+
 						'<span class="from">'+data.user+'</span>'+
 						'<span class="text">'+data.msg+'</span>'+
 					'</li>');
+					if(lockBottom){
+						$('.chat-window').scrollTop($('.chat-window ul').height());
+					}
 				}
 
 			});

@@ -37,7 +37,7 @@ body{
 }
 .chat-wrapper .chat-window ul li .from{
 	border-right: 1px solid #f6f6f6;
-	color: #84ce88;
+	color: #F59038;
 	padding: 0px 10px;
 	text-align: right;
 	width: 134px;
@@ -67,6 +67,7 @@ body{
 }
 .chat-wrapper .chat-input .chat-input-wrapper{
 	padding: 5px;
+	margin-bottom: 0px;
 }
 .chat-wrapper .chat-input input{
 	border: 1px solid #cfdae1;
