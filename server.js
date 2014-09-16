@@ -99,6 +99,9 @@ var Chat = function(){
 							this.updateUserList();
 						}
 					break;
+					case 'bump':
+						this.broadcastMsg(this.buildMsg('server','status', users[key].nick+' bumped the chat'));
+					break;
 				}
 			}
 		},
