@@ -11,7 +11,11 @@
 	</head>
 	<body>
 		<div class="chat-wrapper">
-		<img src="http://th06.deviantart.net/fs71/PRE/f/2013/199/2/3/gabe_newell___half_life_3_by_darrengeers-d4p99ww.png" class="GABEN"/>
+			<div class="chat-userlist">
+				<ul>
+
+				</ul>
+			</div>
 			<div class="chat-window">
 				<ul>
 				</ul>
@@ -30,7 +34,7 @@
 				document.getElementById('chatNotification').volume=0.5;
 
 				$(window).resize(function(){
-					var h = $(window).outerHeight()-($('.chat-wrapper .chat-header').outerHeight()+$('.chat-wrapper .chat-input').outerHeight());
+					var h = $(window).outerHeight()-($('.chat-wrapper .chat-header').outerHeight()+$('.chat-wrapper .chat-input').outerHeight())-10;
 					$('.chat-wrapper .chat-window').css('height',h+'px');
 				});
 				$(window).resize();
@@ -51,6 +55,10 @@
 					$('.chat-input-wrapper input').val('');
 					return false;
 				});
+				socket.on('updateUsers', function(data){
+					console.log(data);
+					updateUserList(data);
+				});
 				socket.on('msg', function(data){
 					if(!isFocused){
 						switchFav('fav2');
@@ -67,6 +75,13 @@
 				}
 				function switchFav(fav){
 					$('#fav').attr('href','images/'+fav+'.jpg');
+				}
+				function updateUserList(users){
+					var user_list = '';
+					for(var i=0;i<users.length;i++){
+						user_list+='<li class="user'+users[i].id+'">'+users[i].nick+'</li>';
+					}
+					$('.chat-userlist ul').html(user_list);
 				}
 				function addStatus(data){
 					var time = new Date(data.time),

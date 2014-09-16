@@ -16,6 +16,7 @@ var Chat = function(){
 
 	var users = {
 		'server': {
+			clientid: 0,
 			key: 'server',
 			nick: 'Gabe Newell',
 			ip: 'Lord Gabe doesn\'t need an ip address, he is everywhere'
@@ -30,15 +31,29 @@ var Chat = function(){
 	return {
 		addUser: function(user){
 			userCount++;
+			user.clientid = userCount;
 			user.nick = 'Gabe Lover '+userCount;
 			user.ip = user.handshake.address;
 			console.log('Connection: '+user.ip);
 			this.broadcastMsg(this.buildMsg('server','status', user.nick+' Connected'));
 			users[user.key] = user;
+			this.updateUserList();
 		},
 		disconnectUser: function(user){
 			delete users[user.key];
 			this.broadcastMsg(this.buildMsg('server','status', user.nick+' Disconnect'));
+			this.updateUserList();
+		},
+		updateUserList: function(){
+			var user_return = [];
+			for(var user_key in users){
+				user_return.push({
+					id: users[user_key].clientid,
+					nick: users[user_key].nick
+				});
+			}
+			console.log(user_return);
+			io.emit('updateUsers', user_return);
 		},
 		broadcastMsg: function(object){
 			io.emit('msg', object);
