@@ -27,6 +27,8 @@
 			jQuery(function($){
 				var appTitle = 'Lambda', isFocused = true, lostFocusCount = 0;
 
+				document.getElementById('chatNotification').volume=0.5;
+
 				$(window).resize(function(){
 					var h = $(window).outerHeight()-($('.chat-wrapper .chat-header').outerHeight()+$('.chat-wrapper .chat-input').outerHeight());
 					$('.chat-wrapper .chat-window').css('height',h+'px');
@@ -43,8 +45,7 @@
 					isFocused = false;
 				});
 
-
-				var socket = io();
+				var socket = io.connect('/');
 				$('.chat-input-wrapper').submit(function(){
 					socket.emit('msg',$('.chat-input-wrapper input').val());
 					$('.chat-input-wrapper input').val('');
@@ -58,7 +59,6 @@
 						document.getElementById('chatNotification').pause();
 						document.getElementById('chatNotification').play();
 					}
-
 					addStatus(data);
 				});
 
@@ -81,7 +81,7 @@
 
 					$('.chat-window ul').append('<li class="'+data.type+'">'+
 						'<span class="time">'+h+':'+m+':'+s+'</span>'+
-						'<span class="from">'+data.user+'</span>'+
+						'<span class="from" title="'+data.ip+'">'+data.user+'</span>'+
 						'<span class="text">'+data.msg+'</span>'+
 					'</li>');
 					if(lockBottom){

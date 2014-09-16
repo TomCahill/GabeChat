@@ -17,7 +17,8 @@ var Chat = function(){
 	var users = {
 		'server': {
 			key: 'server',
-			nick: 'Gabe Newell'
+			nick: 'Gabe Newell',
+			ip: 'Lord Gabe doesn\'t need an ip address, he is everywhere'
 		}
 	},
 	userCount = 0;
@@ -30,6 +31,8 @@ var Chat = function(){
 		addUser: function(user){
 			userCount++;
 			user.nick = 'Gabe Lover '+userCount;
+			user.ip = user.handshake.address;
+			console.log('Connection: '+user.ip);
 			this.broadcastMsg(this.buildMsg('server','status', user.nick+' Connected'));
 			users[user.key] = user;
 		},
@@ -48,6 +51,7 @@ var Chat = function(){
 				'time': Date(),
 				'type': type,
 				'user': users[sender].nick,
+				'ip': users[sender].ip,
 				'msg': msg
 			}
 		},
@@ -96,6 +100,11 @@ var Chat = function(){
 }
 
 var chat_server = new Chat();
+
+io.set('authorization', function (handshake, cb) {
+    //console.log('Auth: ', handshake.query);
+    cb(null, true);
+});
 io.on('connection', function(user){
 	user.key = UUID();
 	chat_server.addUser(user);
