@@ -52,7 +52,6 @@ var Chat = function(){
 					nick: users[user_key].nick
 				});
 			}
-			console.log(user_return);
 			io.emit('updateUsers', user_return);
 		},
 		broadcastMsg: function(object){

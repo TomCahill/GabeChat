@@ -19,6 +19,9 @@ body{
 	background: #FFF;
 	margin:5px;
 }
+.chat-wrapper .chat-window.gaben{
+	background: #FFF url('../images/K6tB7.jpg');
+}
 .chat-wrapper .chat-window ul{
 	margin: 0px;
 	padding: 5px;
@@ -97,4 +100,5 @@ body{
 }
 .chat-wrapper .chat-userlist ul li.user0{
 	color:#838383;
+	cursor:pointer;
 }

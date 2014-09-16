@@ -31,7 +31,7 @@
 			jQuery(function($){
 				var appTitle = 'Lambda', isFocused = true, lostFocusCount = 0;
 
-				document.getElementById('chatNotification').volume=0.5;
+				document.getElementById('chatNotification').volume=0.3;
 
 				$(window).resize(function(){
 					var h = $(window).outerHeight()-($('.chat-wrapper .chat-header').outerHeight()+$('.chat-wrapper .chat-input').outerHeight())-10;
@@ -56,7 +56,6 @@
 					return false;
 				});
 				socket.on('updateUsers', function(data){
-					console.log(data);
 					updateUserList(data);
 				});
 				socket.on('msg', function(data){
@@ -82,6 +81,15 @@
 						user_list+='<li class="user'+users[i].id+'">'+users[i].nick+'</li>';
 					}
 					$('.chat-userlist ul').html(user_list);
+
+					// Stupid code
+					$('.chat-userlist li.user0').click(function(){
+						if($('.chat-window').hasClass('gaben')){
+							$('.chat-window').removeClass('gaben');
+						}else{
+							$('.chat-window').addClass('gaben');
+						}
+					});
 				}
 				function addStatus(data){
 					var time = new Date(data.time),
