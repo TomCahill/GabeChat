@@ -96,17 +96,8 @@ var Chat = function(){
 							var oldNick = users[key].nick;
 							users[key].nick = stripHtml(command[1]);
 							this.broadcastMsg(this.buildMsg('server','status', oldNick+' renamed to '+users[key].nick));
+							this.updateUserList();
 						}
-					break;
-					case 'users':
-						var online_users = [];
-						for (var user_key in users) {
-							if (users.hasOwnProperty(user_key)) {
-								online_users.push(users[user_key].nick);
-							}
-						}
-						this.sendMsg(key,this.buildMsg('server','status', 'Users that are currently connected: '+online_users.join(', ')));
-						this.updateUserList();
 					break;
 				}
 			}
