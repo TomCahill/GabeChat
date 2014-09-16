@@ -106,6 +106,7 @@ var Chat = function(){
 							}
 						}
 						this.sendMsg(key,this.buildMsg('server','status', 'Users that are currently connected: '+online_users.join(', ')));
+						this.updateUserList();
 					break;
 				}
 			}
