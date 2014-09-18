@@ -55,6 +55,7 @@ body{
 .chat-wrapper .chat-window ul li .text{
 	padding-left: 10px;
 	padding-right: 6px;
+	word-break: break-all;
 }
 
 .chat-wrapper .chat-window ul li.status .from{
