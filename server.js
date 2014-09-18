@@ -19,7 +19,7 @@ var Chat = function(){
 			clientid: 0,
 			key: 'server',
 			nick: 'Gabe Newell',
-			ip: 'Lord Gabe doesn\'t need an ip address, he is everywhere'
+			ip: 'Lord Gabe doesn\'t need an ip address, he is everywhere and everything'
 		}
 	},
 	userCount = 0;
@@ -56,7 +56,8 @@ var Chat = function(){
 			for(var user_key in users){
 				user_return.push({
 					id: users[user_key].clientid,
-					nick: users[user_key].nick
+					nick: users[user_key].nick,
+					ip: users[user_key].ip
 				});
 			}
 			io.emit('updateUsers', user_return);

@@ -78,7 +78,7 @@
 				function updateUserList(users){
 					var user_list = '';
 					for(var i=0;i<users.length;i++){
-						user_list+='<li class="user'+users[i].id+'">'+users[i].nick+'</li>';
+						user_list+='<li class="user'+users[i].id+' title="'+users[i].ip+'">'+users[i].nick+'</li>';
 					}
 					$('.chat-userlist ul').html(user_list);
 
