@@ -27,6 +27,13 @@ var Chat = function(){
 	function stripHtml(str){
 		return str.replace(/<\/?([a-z][a-z0-9]*)\b[^>]*>?/gi, '').trim();
 	}
+	function isUserNickTaken(newNick){
+		for(var key in users){
+			if(users[key].nick.toLowerCase()==newNick)
+				return true;
+		}
+		return false;
+	}
 
 	return {
 		addUser: function(user){
@@ -93,9 +100,14 @@ var Chat = function(){
 				switch(command[0]){
 					case 'nick':
 						if(command[1].length>0){
-							var oldNick = users[key].nick;
-							users[key].nick = stripHtml(command[1]);
-							this.broadcastMsg(this.buildMsg('server','status', oldNick+' renamed to '+users[key].nick));
+							var oldNick = users[key].nick, newName = stripHtml(command[1]);
+
+							if(isUserNickTaken(newName.toLowerCase())){
+								this.sendMsg(key,this.buildMsg('server','status', 'Username has already been taken'));
+								break;
+							}
+							users[key].nick = newName;
+							this.broadcastMsg(this.buildMsg('server','status', oldNick+' renamed to '+newName));
 							this.updateUserList();
 						}
 					break;
