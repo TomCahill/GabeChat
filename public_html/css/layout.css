@@ -101,6 +101,10 @@ body{
 	margin-bottom: 5px;
 	color:#F59038;
 }
+.chat-wrapper .chat-userlist ul li .lastActive{
+	color: #5F5F5F;
+	font-size: 11px;
+}
 .chat-wrapper .chat-userlist ul li.user0{
 	color:#838383;
 	cursor:pointer;

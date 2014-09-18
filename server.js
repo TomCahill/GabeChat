@@ -19,7 +19,8 @@ var Chat = function(){
 			clientid: 0,
 			key: 'server',
 			nick: 'Gabe Newell',
-			ip: 'Lord Gabe doesn\'t need an ip address, he is everywhere and everything'
+			ip: 'Lord Gabe doesn\'t need an ip address, he is everywhere and everything',
+			lastActive: new Date()
 		}
 	},
 	userCount = 0;
@@ -41,6 +42,7 @@ var Chat = function(){
 			user.clientid = userCount;
 			user.nick = 'Gabe Lover '+userCount;
 			user.ip = user.handshake.address;
+			user.lastActive = new Date();
 			console.log('Connection: '+user.ip);
 			this.broadcastMsg(this.buildMsg('server','status', user.nick+' Connected'));
 			users[user.key] = user;
@@ -57,6 +59,7 @@ var Chat = function(){
 				user_return.push({
 					id: users[user_key].clientid,
 					nick: users[user_key].nick,
+					lastActive: users[user_key].lastActive,
 					ip: users[user_key].ip
 				});
 			}
@@ -64,6 +67,7 @@ var Chat = function(){
 		},
 		broadcastMsg: function(object){
 			io.emit('msg', object);
+			this.updateUserList();
 		},
 		sendMsg: function(key,object){
 			users[key].emit('msg', object);
@@ -78,6 +82,8 @@ var Chat = function(){
 			}
 		},
 		parseMsg: function(key,msg){
+
+			users[key].lastActive = new Date();
 
 			if(msg.substring(0,1)=='/'){
 				this.parseCommand(key,msg.substring(1,msg.length));

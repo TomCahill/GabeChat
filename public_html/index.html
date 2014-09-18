@@ -5,7 +5,8 @@
 		<link rel="stylesheet" href="css/bootstrap.min.css">
 		<link rel="stylesheet" href="css/layout.css">
 		<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
-		<script src="/socket.io/socket.io.js"></script>
+		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+		<script type="text/javascript" src="js/gabeChat.js"></script>
 
 		<link rel="shortcut icon" id="fav" href="images/fav1.jpg">
 	</head>
@@ -29,82 +30,7 @@
 		<audio id="chatNotification" src="audio/notification.wav" preload="auto"></audio>
 		<script type="text/javascript">
 			jQuery(function($){
-				var appTitle = 'Lambda', isFocused = true, lostFocusCount = 0;
-
-				document.getElementById('chatNotification').volume=0.3;
-
-				$(window).resize(function(){
-					var h = $(window).outerHeight()-($('.chat-wrapper .chat-header').outerHeight()+$('.chat-wrapper .chat-input').outerHeight())-10;
-					$('.chat-wrapper .chat-window').css('height',h+'px');
-				});
-				$(window).resize();
-
-				$(window).focus(function(){
-					isFocused = true;
-					switchFav('fav1');
-					lostFocusCount=0;
-					updateTitleCount(lostFocusCount);
-				});
-				$(window).blur(function(){
-					isFocused = false;
-				});
-
-				var socket = io.connect('/');
-				$('.chat-input-wrapper').submit(function(){
-					socket.emit('msg',$('.chat-input-wrapper input').val());
-					$('.chat-input-wrapper input').val('');
-					return false;
-				});
-				socket.on('updateUsers', function(data){
-					updateUserList(data);
-				});
-				socket.on('msg', function(data){
-					if(!isFocused){
-						switchFav('fav2');
-						lostFocusCount++;
-						updateTitleCount(lostFocusCount);
-						document.getElementById('chatNotification').pause();
-						document.getElementById('chatNotification').play();
-					}
-					addStatus(data);
-				});
-
-				function updateTitleCount(int){
-					$('head title').text(appTitle+' ('+int+')');
-				}
-				function switchFav(fav){
-					$('#fav').attr('href','images/'+fav+'.jpg');
-				}
-				function updateUserList(users){
-					var user_list = '';
-					for(var i=0;i<users.length;i++){
-						user_list+='<li class="user'+users[i].id+' title="'+users[i].ip+'">'+users[i].nick+'</li>';
-					}
-					$('.chat-userlist ul').html(user_list);
-
-					// Stupid code
-					$('.chat-userlist li.user0').click(function(){
-						if($('.chat-window').hasClass('gaben')){
-							$('.chat-window').removeClass('gaben');
-						}else{
-							$('.chat-window').addClass('gaben');
-						}
-					});
-				}
-				function addStatus(data){
-					var time = new Date(data.time),
-						h=(time.getHours()<10) ? '0'+time.getHours() : time.getHours(),
-						m=(time.getMinutes()<10) ? '0'+time.getMinutes() : time.getMinutes(),
-						s=(time.getSeconds()<10) ? '0'+time.getSeconds() : time.getSeconds();
-
-					$('.chat-window ul').append('<li class="'+data.type+'">'+
-						'<span class="time">'+h+':'+m+':'+s+'</span>'+
-						'<span class="from" title="'+data.ip+'">'+data.user+'</span>'+
-						'<span class="text">'+data.msg+'</span>'+
-					'</li>');
-					$('.chat-window').scrollTop($('.chat-window ul').height());
-				}
-
+				new gabe_chat('Lambda');
 			});
 		</script>
 	</body>
