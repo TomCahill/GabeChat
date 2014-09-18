@@ -80,6 +80,15 @@ var Chat = function(){
 							this.broadcastMsg(this.buildMsg('server','status', oldNick+' renamed to '+users[key].nick));
 						}
 					break;
+					case 'whoisthefaggot':
+						this.broadcastMsg(this.buildMsg('That would be Ben'));
+					break;
+					case 'setColor':
+						if(command[1].length>0)
+						{
+							$(".chat-wrapper .chat-window ul li.status .from").css("color", stripHtml(command[1]));
+						}
+					break;
 					case 'users':
 						var online_users = [];
 						for (var user_key in users) {
