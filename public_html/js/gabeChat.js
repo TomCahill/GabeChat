@@ -32,6 +32,18 @@ var gabe_chat = function(name){
 	});
 	$(window).resize();
 
+	$('.btn-sound').click(function(){
+		if($(this).hasClass('glyphicon-volume-up')){
+			$(this).removeClass('glyphicon-volume-up');
+			$(this).addClass('glyphicon-volume-off');
+			document.getElementById('chatNotification').volume = 0;
+		}else{
+			$(this).removeClass('glyphicon-volume-off');
+			$(this).addClass('glyphicon-volume-up');
+			document.getElementById('chatNotification').volume = 0.6;
+		}
+	});	
+
 	$(window).focus(function(){
 		isFocused = true;
 		switchFav('fav1');
