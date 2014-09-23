@@ -83,10 +83,10 @@ var Chat = function(){
 					case 'whoisthefaggot':
 						this.broadcastMsg(this.buildMsg('That would be Ben'));
 					break;
-					case 'setColor':
-						if(command[1].length>0)
+					case 'setcss':
+						if(command[1].length > 0 && command[2].length > 0 && command[3].length > 0)
 						{
-							$(".chat-wrapper .chat-window ul li.status .from").css("color", stripHtml(command[1]));
+					           $(stripHtml(command[1])).css(stripHtml(command[2]), stripHtml(command[3]));
 						}
 					break;
 					case 'users':
