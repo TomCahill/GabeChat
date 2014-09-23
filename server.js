@@ -19,6 +19,7 @@ var Chat = function(){
 			clientid: 0,
 			key: 'server',
 			nick: 'Gabe Newell',
+			colour: '#333',
 			ip: 'Lord Gabe doesn\'t need an ip address, he is everywhere and everything',
 			lastActive: new Date()
 		}
@@ -41,6 +42,7 @@ var Chat = function(){
 			userCount++;
 			user.clientid = userCount;
 			user.nick = 'Gabe Lover '+userCount;
+			user.colour = '#333';
 			user.ip = user.handshake.address;
 			user.lastActive = new Date();
 			console.log('Connection: '+user.ip);
@@ -77,6 +79,7 @@ var Chat = function(){
 				'time': Date(),
 				'type': type,
 				'user': users[sender].nick,
+				'color': users[sender].colour,
 				'ip': users[sender].ip,
 				'msg': msg
 			}
@@ -104,7 +107,7 @@ var Chat = function(){
 		parseCommand: function(key,command){
 			if(command.length>0){
 				command = command.split(' ');
-				switch(command[0]){
+				switch(command[0].toLowerCase()){
 					case 'nick':
 						if(command[1].length>0){
 							var oldNick = users[key].nick, newName = stripHtml(command[1]);
@@ -116,6 +119,19 @@ var Chat = function(){
 							users[key].nick = newName;
 							this.broadcastMsg(this.buildMsg('server','status', oldNick+' renamed to '+newName));
 							this.updateUserList();
+						}
+					break;
+					case 'whois':
+						if(command[1].length>0){
+							var name = stripHtml(command[1]);
+							this.broadcastMsg(this.buildMsg('server','status', 'Who is '+name+'? '+name+' is a faggot'));
+						}
+					break;
+					case 'setcolour':
+						if(command[1].length>0){
+							// Parse hex code
+							users[key].colour = stripHtml(command[1]);
+							this.sendMsg(key,this.buildMsg('server','status', 'Your text colour has changed'));
 						}
 					break;
 					case 'bump':

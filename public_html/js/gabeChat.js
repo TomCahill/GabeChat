@@ -117,7 +117,7 @@ var gabe_chat = function(name){
 		$('.chat-window ul').append('<li class="'+data.type+'">'+
 			'<span class="time">'+h+':'+m+':'+s+'</span>'+
 			'<span class="from" title="'+data.ip+'">'+data.user+'</span>'+
-			'<span class="text">'+data.msg+'</span>'+
+			'<span class="text" style="color:'+data.color+'">'+data.msg+'</span>'+
 		'</li>');
 		$('.chat-window').scrollTop($('.chat-window ul').height());
 	}
