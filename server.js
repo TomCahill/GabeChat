@@ -109,7 +109,7 @@ var Chat = function(){
 				command = command.split(' ');
 				switch(command[0].toLowerCase()){
 					case 'nick':
-						if(command[1].length>0){
+						if(typeof command[1]!='undefined' && command[1].length>0){
 							var oldNick = users[key].nick, newName = stripHtml(command[1]);
 
 							if(isUserNickTaken(newName.toLowerCase())){
@@ -122,13 +122,13 @@ var Chat = function(){
 						}
 					break;
 					case 'whois':
-						if(command[1].length>0){
+						if(typeof command[1]!='undefined' && command[1].length>0){
 							var name = stripHtml(command[1]);
 							this.broadcastMsg(this.buildMsg('server','status', 'Who is '+name+'? '+name+' is a faggot'));
 						}
 					break;
 					case 'setcolour':
-						if(command[1].length>0){
+						if(typeof command[1]!='undefined' && command[1].length>0){
 							// Parse hex code
 							users[key].colour = stripHtml(command[1]);
 							this.sendMsg(key,this.buildMsg('server','status', 'Your text colour has changed'));
