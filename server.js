@@ -114,6 +114,7 @@ var Chat = function(){
 		},
 		parseMsg: function(key,msg){
 
+			users[key].state = 'active'; // Shitty quick fix for people reusing an old socket
 			users[key].lastActive = new Date();
 
 			if(msg.substring(0,1)=='/'){
