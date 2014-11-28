@@ -100,7 +100,7 @@ var Chat = function(){
 			this.updateUserList();
 		},
 		sendMsg: function(key,object){
-			users[key].emit('msg', object);
+			users[key].client.emit('msg', object);
 		},
 		buildMsg: function(sender,type,msg){
 			return {
