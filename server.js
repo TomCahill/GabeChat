@@ -56,14 +56,25 @@ var Chat = function(){
 		addUser: function(key,client){
 			userCount++;
 			var user = new Gaben_User(userCount,key,client);
-
-			this.broadcastMsg(this.buildMsg('server','status', user.nick+' Connected'));
 			users[key] = user;
-			this.updateUserList();
+			this.connectUser(user);
 			return user;
 		},
+		reassignUser: function(key,client){
+			var user = false;
+			if(typeof users[key] != 'undefined'){
+				user = users[key];
+				user.client = client;
+				this.connectUser(user);
+			}
+			return user;
+		},
+		connectUser: function(user){ // Not really a connection function - Just to broadcast that the user has re/joined
+			this.broadcastMsg(this.buildMsg('server','status', user.nick+' Connected'));
+			this.updateUserList();
+		},
 		disconnectUser: function(user){
-			delete users[user.key];
+			//delete users[user.key];
 			this.broadcastMsg(this.buildMsg('server','status', user.nick+' Disconnect'));
 			this.updateUserList();
 		},
@@ -177,18 +188,18 @@ function getCookieFromStr(cookie_name,str){
 }
 
 var chat_server = new Chat();
-/*io.set('authorization', function (handshake, cb) {
-	var cookie = getCookieFromStr(cookie_name,handshake.headers.cookie);
-	if(cookie){
-		// Check to see if key exists in users
-		//handshake.uuid = cookie;
-	}else{
-		// Generate UUID i guess
-	}
-	cb(null, true);
-});*/
 io.on('connection', function(client){
-	var user = chat_server.addUser(UUID(),client);
+	var user = false;
+
+	/* Don't look, this bit is going to be nasty - #YOLO */
+	var cookie_key = getCookieFromStr(cookie_name,client.handshake.headers.cookie);
+	if(cookie_key){
+		user = chat_server.reassignUser(cookie_key,client);
+	}
+	if(!user){
+		user = chat_server.addUser(UUID(),client);
+	}
+	/* You can look now */
 
 	user.client.emit('client_key',user.key);
 
