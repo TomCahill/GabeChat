@@ -4,6 +4,8 @@ var express = require('express'),
 	io = require('socket.io')(http),
 	UUID = require('node-uuid');
 
+var cookie_name = 'gabeChat';
+
 var path = require('path');
 
 app.use(express.static(path.join(__dirname, 'public_html')));
@@ -11,6 +13,18 @@ app.use(express.static(path.join(__dirname, 'public_html')));
 http.listen(8080, function(){
   console.log('listening on *:8080');
 });
+
+var Gaben_User = function(id,key,client){
+	return {
+		clientid: id,
+		key: key,
+		nick: 'Gaben '+id,
+		colour: '#333',
+		ip: client.handshake.address,
+		lastActive: new Date(),
+		client: client
+	}
+}
 
 var Chat = function(){
 
@@ -21,7 +35,8 @@ var Chat = function(){
 			nick: 'Gabe Newell',
 			colour: '#333',
 			ip: 'Lord Gabe doesn\'t need an ip address, he is everywhere and everything',
-			lastActive: new Date()
+			lastActive: new Date(),
+			client: false
 		}
 	},
 	userCount = 0;
@@ -38,17 +53,14 @@ var Chat = function(){
 	}
 
 	return {
-		addUser: function(user){
+		addUser: function(key,client){
 			userCount++;
-			user.clientid = userCount;
-			user.nick = 'Gabe Lover '+userCount;
-			user.colour = '#333';
-			user.ip = user.handshake.address;
-			user.lastActive = new Date();
-			console.log('Connection: '+user.ip);
+			var user = new Gaben_User(userCount,key,client);
+
 			this.broadcastMsg(this.buildMsg('server','status', user.nick+' Connected'));
-			users[user.key] = user;
+			users[key] = user;
 			this.updateUserList();
+			return user;
 		},
 		disconnectUser: function(user){
 			delete users[user.key];
@@ -95,10 +107,15 @@ var Chat = function(){
 
 			msg = stripHtml(msg);
 
-			link_regex_match = /((?:(http|https|Http|Https|rtsp|Rtsp):\/\/(?:(?:[a-zA-Z0-9\$\-\_\.\+\!\*\'\(\)\,\;\?\&\=]|(?:\%[a-fA-F0-9]{2})){1,64}(?:\:(?:[a-zA-Z0-9\$\-\_\.\+\!\*\'\(\)\,\;\?\&\=]|(?:\%[a-fA-F0-9]{2})){1,25})?\@)?)?((?:(?:[a-zA-Z0-9][a-zA-Z0-9\-]{0,64}\.)+(?:(?:aero|arpa|asia|a[cdefgilmnoqrstuwxz])|(?:biz|b[abdefghijmnorstvwyz])|(?:cat|com|coop|c[acdfghiklmnoruvxyz])|d[ejkmoz]|(?:edu|e[cegrstu])|f[ijkmor]|(?:gov|g[abdefghilmnpqrstuwy])|h[kmnrtu]|(?:info|int|i[delmnoqrst])|(?:jobs|j[emop])|k[eghimnrwyz]|l[abcikrstuvy]|(?:mil|mobi|museum|m[acdghklmnopqrstuvwxyz])|(?:name|net|n[acefgilopruz])|(?:org|om)|(?:pro|p[aefghklmnrstwy])|qa|r[eouw]|s[abcdeghijklmnortuvyz]|(?:tel|travel|t[cdfghjklmnoprtvwz])|u[agkmsyz]|v[aceginu]|w[fs]|y[etu]|z[amw]))|(?:(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9])\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[0-9])))(?:\:\d{1,5})?)(\/(?:(?:[a-zA-Z0-9\;\/\?\:\@\&\=\#\~\-\.\+\!\*\'\(\)\,\_])|(?:\%[a-fA-F0-9]{2}))*)?(?:\b|$)/gi;
-			msg =  msg.replace(link_regex_match, function(url) {
-				return '<a href="' + url + '" target="_BLANK">' + url + '</a>';
-			});
+			var image_regex_match = /^https?:\/\/(?:[a-z\-]+\.)+[a-z]{2,6}(?:\/[^\/#?]+)+\.(?:jpe?g|gif|png)$/;
+			if(image_regex_match.test(msg)){
+				msg = '<img src="' + msg + '"/>';
+			}else{
+				link_regex_match = /((?:(http|https|Http|Https|rtsp|Rtsp):\/\/(?:(?:[a-zA-Z0-9\$\-\_\.\+\!\*\'\(\)\,\;\?\&\=]|(?:\%[a-fA-F0-9]{2})){1,64}(?:\:(?:[a-zA-Z0-9\$\-\_\.\+\!\*\'\(\)\,\;\?\&\=]|(?:\%[a-fA-F0-9]{2})){1,25})?\@)?)?((?:(?:[a-zA-Z0-9][a-zA-Z0-9\-]{0,64}\.)+(?:(?:aero|arpa|asia|a[cdefgilmnoqrstuwxz])|(?:biz|b[abdefghijmnorstvwyz])|(?:cat|com|coop|c[acdfghiklmnoruvxyz])|d[ejkmoz]|(?:edu|e[cegrstu])|f[ijkmor]|(?:gov|g[abdefghilmnpqrstuwy])|h[kmnrtu]|(?:info|int|i[delmnoqrst])|(?:jobs|j[emop])|k[eghimnrwyz]|l[abcikrstuvy]|(?:mil|mobi|museum|m[acdghklmnopqrstuvwxyz])|(?:name|net|n[acefgilopruz])|(?:org|om)|(?:pro|p[aefghklmnrstwy])|qa|r[eouw]|s[abcdeghijklmnortuvyz]|(?:tel|travel|t[cdfghjklmnoprtvwz])|u[agkmsyz]|v[aceginu]|w[fs]|y[etu]|z[amw]))|(?:(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9])\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[0-9])))(?:\:\d{1,5})?)(\/(?:(?:[a-zA-Z0-9\;\/\?\:\@\&\=\#\~\-\.\+\!\*\'\(\)\,\_])|(?:\%[a-fA-F0-9]{2}))*)?(?:\b|$)/gi;			
+				msg =  msg.replace(link_regex_match, function(url) {
+					return '<a href="' + url + '" target="_BLANK">' + url + '</a>';
+				});
+			}
 
 			if(msg.length>0){
 				this.broadcastMsg(this.buildMsg(key,'message',msg));
@@ -149,20 +166,36 @@ var Chat = function(){
 	}
 }
 
+function getCookieFromStr(cookie_name,str){
+	var strSplit = str.split(';');
+	for(var i=0; i<strSplit.length;i++){
+		var name = strSplit[i].split('=')[0].replace(/^\s+/,''), value = strSplit[i].split('=')[1];
+		if(cookie_name==name)
+			return value;
+	}
+	return false;
+}
+
 var chat_server = new Chat();
+/*io.set('authorization', function (handshake, cb) {
+	var cookie = getCookieFromStr(cookie_name,handshake.headers.cookie);
+	if(cookie){
+		// Check to see if key exists in users
+		//handshake.uuid = cookie;
+	}else{
+		// Generate UUID i guess
+	}
+	cb(null, true);
+});*/
+io.on('connection', function(client){
+	var user = chat_server.addUser(UUID(),client);
 
-io.set('authorization', function (handshake, cb) {
-    //console.log('Auth: ', handshake.query);
-    cb(null, true);
-});
-io.on('connection', function(user){
-	user.key = UUID();
-	chat_server.addUser(user);
+	user.client.emit('client_key',user.key);
 
-	user.on('disconnect',function(){
+	user.client.on('disconnect',function(){
 		chat_server.disconnectUser(user);
 	});
-	user.on('msg',function(msg){
+	user.client.on('msg',function(msg){
 		chat_server.parseMsg(user.key,msg);
 	});
 });

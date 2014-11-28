@@ -54,6 +54,12 @@ var gabe_chat = function(name){
 	});
 
 	var socket = io.connect('/');
+	socket.on('client_key', function(data){
+		console.log(data);
+		var date = new Date();
+		date.setTime(date.getTime()+(30*24*60*60*1000));
+		document.cookie = 'gabeChat='+data+'; expires='+date.toGMTString()+'; path=/'
+	});
 	$('.chat-input-wrapper').submit(function(){
 		socket.emit('msg',$('.chat-input-wrapper input').val());
 		$('.chat-input-wrapper input').val('');

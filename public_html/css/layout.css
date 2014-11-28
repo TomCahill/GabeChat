@@ -58,6 +58,13 @@ body{
 	word-break: break-all;
 }
 
+.chat-wrapper .chat-window ul li .text img{
+	display: block;
+	max-width:200px;
+	max-width:200px;
+	border:1px solid #282F33;
+}
+
 .chat-wrapper .chat-window ul li.status .from{
 	color:#838383;
 }
