@@ -22,6 +22,7 @@ var Gaben_User = function(id,key,client){
 		colour: '#333',
 		ip: client.handshake.address,
 		lastActive: new Date(),
+		state: 'inactive',
 		client: client
 	}
 }
@@ -36,6 +37,7 @@ var Chat = function(){
 			colour: '#333',
 			ip: 'Lord Gabe doesn\'t need an ip address, he is everywhere and everything',
 			lastActive: new Date(),
+			state: 'active',
 			client: false
 		}
 	},
@@ -178,11 +180,13 @@ var Chat = function(){
 }
 
 function getCookieFromStr(cookie_name,str){
-	var strSplit = str.split(';');
-	for(var i=0; i<strSplit.length;i++){
-		var name = strSplit[i].split('=')[0].replace(/^\s+/,''), value = strSplit[i].split('=')[1];
-		if(cookie_name==name)
-			return value;
+	if(typeof str != 'undefined' && str.length>0){
+		var strSplit = str.split(';');
+		for(var i=0; i<strSplit.length;i++){
+			var name = strSplit[i].split('=')[0].replace(/^\s+/,''), value = strSplit[i].split('=')[1];
+			if(cookie_name==name)
+				return value;
+		}
 	}
 	return false;
 }
