@@ -134,8 +134,14 @@ var Chat = function(){
 							this.sendMsg(key,this.buildMsg('server','status', 'Your text colour has changed'));
 						}
 					break;
-					case 'bump':
-						this.broadcastMsg(this.buildMsg('server','status', users[key].nick+' bumped the chat'));
+					case 'users':
+						var user_string_return = '', i=0;
+						for(var key in users){
+							var sep = (i>0) ? ', ' : '';
+							user_string_return+=sep+users[key].nick;
+							i++;
+						}
+						this.broadcastMsg(this.buildMsg('server','status', user_string_return));
 					break;
 				}
 			}
