@@ -72,23 +72,26 @@ var Chat = function(){
 			return user;
 		},
 		connectUser: function(user){ // Not really a connection function - Just to broadcast that the user has re/joined
+			user.state = 'active';
 			this.broadcastMsg(this.buildMsg('server','status', user.nick+' Connected'));
 			this.updateUserList();
 		},
 		disconnectUser: function(user){
 			//delete users[user.key];
+			user.state = 'inactive';
 			this.broadcastMsg(this.buildMsg('server','status', user.nick+' Disconnect'));
 			this.updateUserList();
 		},
 		updateUserList: function(){
 			var user_return = [];
 			for(var user_key in users){
-				user_return.push({
-					id: users[user_key].clientid,
-					nick: users[user_key].nick,
-					lastActive: users[user_key].lastActive,
-					ip: users[user_key].ip
-				});
+				if(users[user_key].state=='active')
+					user_return.push({
+						id: users[user_key].clientid,
+						nick: users[user_key].nick,
+						lastActive: users[user_key].lastActive,
+						ip: users[user_key].ip
+					});
 			}
 			io.emit('updateUsers', user_return);
 		},
