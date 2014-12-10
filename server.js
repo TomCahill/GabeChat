@@ -11,8 +11,13 @@ var path = require('path');
 app.use(express.static(path.join(__dirname, 'public_html')));
 
 http.listen(8080, function(){
-  console.log('listening on *:8080');
+  addConsoleLog('listening on *:8080');
 });
+
+function addConsoleLog(str){
+	var t = new Date;
+	console.log(t.getHours()+':'+t.getMinutes()+':'+t.getSeconds()+' - '+str);
+}
 
 var Gaben_User = function(id,key,client){
 	return {
@@ -73,13 +78,15 @@ var Chat = function(){
 		},
 		connectUser: function(user){ // Not really a connection function - Just to broadcast that the user has re/joined
 			user.state = 'active';
+			addConsoleLog('User Connected: '+user.client.handshake.address+':'+user.nick);
 			this.broadcastMsg(this.buildMsg('server','status', user.nick+' Connected'));
 			this.updateUserList();
 		},
-		disconnectUser: function(user){
+		disconnectUser: function(user,reason){
 			//delete users[user.key];
 			user.state = 'inactive';
-			this.broadcastMsg(this.buildMsg('server','status', user.nick+' Disconnect'));
+			addConsoleLog('User Disconnect: '+user.client.handshake.address+':'+user.nick+' - '+reason);
+			this.broadcastMsg(this.buildMsg('server','status', user.nick+' Disconnect - '+reason));
 			this.updateUserList();
 		},
 		updateUserList: function(){
@@ -211,8 +218,8 @@ io.on('connection', function(client){
 
 	user.client.emit('client_key',user.key);
 
-	user.client.on('disconnect',function(){
-		chat_server.disconnectUser(user);
+	user.client.on('disconnect',function(reason){
+		chat_server.disconnectUser(user,reason);
 	});
 	user.client.on('msg',function(msg){
 		chat_server.parseMsg(user.key,msg);
