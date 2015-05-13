@@ -53,7 +53,7 @@ var gabe_chat = function(name){
 		isFocused = false;
 	});
 
-	var socket = io.connect('/');
+	var socket = io.connect(':8080');
 	socket.on('client_key', function(data){
 		console.log(data);
 		var date = new Date();
