@@ -8,5 +8,6 @@
     "node-uuid": "^1.4.1",
     "socket.io": "*"
   },
-  "test_hook": true
+  "test_hook": true,
+  "test_hook2": true
 }
