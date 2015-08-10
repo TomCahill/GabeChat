@@ -24,7 +24,8 @@ var gabe_chat = function(name){
 		users=[],
 		appTitle = name || 'Gabe Chat',
 		isFocused = true,
-		lostFocusCount = 0;
+		lostFocusCount = 0,
+		isShowYoutubeEmbedded = true;
 
 	$(window).resize(function(){
 		var h = $(window).outerHeight()-($('.chat-wrapper .chat-header').outerHeight()+$('.chat-wrapper .chat-input').outerHeight())-10;
@@ -33,16 +34,25 @@ var gabe_chat = function(name){
 	$(window).resize();
 
 	$('.btn-sound').click(function(){
-		if($(this).hasClass('glyphicon-volume-up')){
-			$(this).removeClass('glyphicon-volume-up');
-			$(this).addClass('glyphicon-volume-off');
+		if($(this).hasClass('fa-volume-up')){
+			$(this).removeClass('fa-volume-up');
+			$(this).addClass('fa-volume-off');
 			document.getElementById('chatNotification').volume = 0;
 		}else{
-			$(this).removeClass('glyphicon-volume-off');
-			$(this).addClass('glyphicon-volume-up');
+			$(this).removeClass('fa-volume-off');
+			$(this).addClass('fa-volume-up');
 			document.getElementById('chatNotification').volume = 0.6;
 		}
-	});	
+	});
+	$('.btn-youtube').click(function(){
+		if(!isShowYoutubeEmbedded){
+			$(this).removeClass('disabled');
+			isShowYoutubeEmbedded = true;
+		}else{
+			$(this).addClass('disabled');
+			isShowYoutubeEmbedded = false;
+		}
+	});
 
 	$(window).focus(function(){
 		isFocused = true;
@@ -77,7 +87,7 @@ var gabe_chat = function(name){
 			document.getElementById('chatNotification').pause();
 			document.getElementById('chatNotification').play();
 		}
-		addStatus(data);
+		parseMessageData(data);
 	});
 
 	setInterval(function(){
@@ -113,6 +123,14 @@ var gabe_chat = function(name){
 		for(var i=0;i<users.length;i++){
 			$('.user'+users[i].id+' .lastActive').html(timeSince(users[i].lastActive));
 		}
+	}
+	function parseMessageData(data){
+		if(data.type=='youtube' && !isShowYoutubeEmbedded){
+			data.msg = 'Youtube Embedded Blocked: YOUTUBE URL HERE';
+			data.type = 'message';
+		}
+
+		addStatus(data);
 	}
 	function addStatus(data){
 		var time = new Date(data.time),

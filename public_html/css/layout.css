@@ -122,9 +122,13 @@ body{
 	bottom: 50px;
 	right: 10px;
 }
-.chat-wrapper .chat-userlist-icons span{
+.chat-wrapper .chat-userlist-icons i{
 	cursor: pointer;
-	font-size: 25px;
+	font-size: 26px;
+	width: 26px;
+}
+.chat-wrapper .chat-userlist-icons i.disabled{
+	color: #616161;
 }
 
 @media only screen and (max-width: 767px) {
@@ -134,7 +138,26 @@ body{
 }
 
 @media only screen and (max-width: 479px) {
-	.chat-wrapper .chat-window ul li .time, .chat-wrapper .chat-window ul li .from{
-		width:50%;
+	.chat-wrapper .chat-window ul li{
+		display: block;
 	}
+	.chat-wrapper .chat-window ul li span{
+		display: block;
+	}
+	.chat-wrapper .chat-window ul li .from{
+		float: left;
+	    text-align: left;
+	    border-right: 0px;
+	    width: 50%;
+	}
+	.chat-wrapper .chat-window ul li .time{
+		float: right;
+		width: 50%;
+	}
+	.chat-wrapper .chat-window ul li .text{
+		clear: both;
+	}
+}
+@media only screen and (max-width: 479px) {
+
 }
