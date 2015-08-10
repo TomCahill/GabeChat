@@ -63,10 +63,7 @@ var Chat = function(){
 		return false;
 	}
 
-	return 
-		loaded: function(){
-			this.broadcastMsg(this.buildMsg('server','status', 'Server has been restarted, you may need to refresh your client to get the latest changes.'));
-		},
+	return {
 		addUser: function(key,client){
 			userCount++;
 			var user = new Gaben_User(userCount,key,client);
@@ -237,4 +234,3 @@ io.on('connection', function(client){
 		chat_server.parseMsg(user.key,msg);
 	});
 });
-chat_server.loaded();
