@@ -176,6 +176,15 @@ var Chat = function(){
 							this.sendMsg(key,this.buildMsg('server','status', 'Your text colour has changed'));
 						}
 					break;
+					case 'whoisthefaggot':
+						this.broadcastMsg(this.buildMsg('That would be Ben'));
+					break;
+					case 'setcss':
+						if(command[1].length > 0 && command[2].length > 0 && command[3].length > 0)
+						{
+					           $(stripHtml(command[1])).css(stripHtml(command[2]), stripHtml(command[3]));
+						}
+					break;
 					case 'users':
 						var user_string_return = '', i=0;
 						for(var key in users){
