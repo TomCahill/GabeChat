@@ -140,8 +140,9 @@ var Chat = function(){
 			if(image_regex_match.test(msg)){
 				msg = '<a href="' + msg + '" target="_BLANK"> <img src="' + msg + '"/></a>';
 				type = 'image';
-			}else if(youtube_regex_match.test(msg)){
-				//msg = '<iframe width="360" height="200" src="https://www.youtube.com/embed/pOGXSFK3Xsw" frameborder="0" allowfullscreen></iframe>';
+			}else if(match_split = msg.match(youtube_regex_match)){
+				var video_id = match_split[1];
+				msg = '<iframe width="360" height="200" src="https://www.youtube.com/embed/'+video_id+'" frameborder="0" allowfullscreen></iframe>';
 				type = 'youtube';
 			}else{
 				msg =  msg.replace(link_regex_match, function(url) {

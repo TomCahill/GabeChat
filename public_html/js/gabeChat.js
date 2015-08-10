@@ -126,7 +126,8 @@ var gabe_chat = function(name){
 	}
 	function parseMessageData(data){
 		if(data.type=='youtube' && !isShowYoutubeEmbedded){
-			data.msg = 'Youtube Embedded Blocked: YOUTUBE URL HERE';
+			var video_url = $(data.msg).attr('src');
+			data.msg = 'You have embedded videos off: <a href="'+video_url+'" target="_BLANK">'+video_url+'</a>';
 			data.type = 'message';
 		}
 
