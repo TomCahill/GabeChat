@@ -25,6 +25,7 @@ var gabe_chat = function(name){
 		appTitle = name || 'Gabe Chat',
 		isFocused = true,
 		lostFocusCount = 0,
+		isSilentClient = false,
 		isShowYoutubeEmbedded = true;
 
 	$(window).resize(function(){
@@ -37,10 +38,12 @@ var gabe_chat = function(name){
 		if($(this).hasClass('fa-volume-up')){
 			$(this).removeClass('fa-volume-up');
 			$(this).addClass('fa-volume-off');
+			isSilentClient=true;
 			document.getElementById('chatNotification').volume = 0;
 		}else{
 			$(this).removeClass('fa-volume-off');
 			$(this).addClass('fa-volume-up');
+			isSilentClient=false;
 			document.getElementById('chatNotification').volume = 0.6;
 		}
 	});
@@ -129,6 +132,8 @@ var gabe_chat = function(name){
 			var video_url = $(data.msg).attr('src');
 			data.msg = 'You have embedded videos off: <a href="'+video_url+'" target="_BLANK">'+video_url+'</a>';
 			data.type = 'message';
+		}else if(data.type=='audio' && !isSilentClient){
+
 		}
 
 		addStatus(data);
@@ -144,6 +149,11 @@ var gabe_chat = function(name){
 			'<span class="from" title="'+data.ip+'">'+data.user+'</span>'+
 			'<span class="text" style="color:'+data.color+'">'+data.msg+'</span>'+
 		'</li>');
+
+		if(data.type=='audio' && !isSilentClient){
+			document.getElementById('audioMsg'+data.id).play();
+		}
+
 		$('.chat-window').scrollTop($('.chat-window ul').height());
 	}
 }

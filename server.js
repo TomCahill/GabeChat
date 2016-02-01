@@ -35,6 +35,7 @@ var Gaben_User = function(id,key,client){
 var Chat = function(){
 
 	var image_regex_match = /^https?:\/\/(?:[a-z\-]+\.)+[a-z]{2,6}(?:\/[^\/#?]+)+\.(?:jpe?g|gif|png)$/,
+		audio_regex_match = /^https?:\/\/(?:[a-z\-]+\.)+[a-z]{2,6}(?:\/[^\/#?]+)+\.(?:mp3|mp4|ogg|wave)$/,
 		youtube_regex_match = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/,
 		link_regex_match = /((?:(http|https|Http|Https|rtsp|Rtsp):\/\/(?:(?:[a-zA-Z0-9\$\-\_\.\+\!\*\'\(\)\,\;\?\&\=]|(?:\%[a-fA-F0-9]{2})){1,64}(?:\:(?:[a-zA-Z0-9\$\-\_\.\+\!\*\'\(\)\,\;\?\&\=]|(?:\%[a-fA-F0-9]{2})){1,25})?\@)?)?((?:(?:[a-zA-Z0-9][a-zA-Z0-9\-]{0,64}\.)+(?:(?:aero|arpa|asia|a[cdefgilmnoqrstuwxz])|(?:biz|b[abdefghijmnorstvwyz])|(?:cat|com|coop|c[acdfghiklmnoruvxyz])|d[ejkmoz]|(?:edu|e[cegrstu])|f[ijkmor]|(?:gov|g[abdefghilmnpqrstuwy])|h[kmnrtu]|(?:info|int|i[delmnoqrst])|(?:jobs|j[emop])|k[eghimnrwyz]|l[abcikrstuvy]|(?:mil|mobi|museum|m[acdghklmnopqrstuvwxyz])|(?:name|net|n[acefgilopruz])|(?:org|om)|(?:pro|p[aefghklmnrstwy])|qa|r[eouw]|s[abcdeghijklmnortuvyz]|(?:tel|travel|t[cdfghjklmnoprtvwz])|u[agkmsyz]|v[aceginu]|w[fs]|y[etu]|z[amw]))|(?:(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9])\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[0-9])))(?:\:\d{1,5})?)(\/(?:(?:[a-zA-Z0-9\;\/\?\:\@\&\=\#\~\-\.\+\!\*\'\(\)\,\_])|(?:\%[a-fA-F0-9]{2}))*)?(?:\b|$)/gi;
 
@@ -50,6 +51,7 @@ var Chat = function(){
 			client: false
 		}
 	},
+	msgCount = 0,
 	userCount = 0;
 
 	function stripHtml(str){
@@ -113,8 +115,12 @@ var Chat = function(){
 		sendMsg: function(key,object){
 			users[key].client.emit('msg', object);
 		},
-		buildMsg: function(sender,type,msg){
+		buildMsg: function(sender,type,msg,msgID){
+			if(!msgID || msgID<1)
+				msgID = msgCount;
+			msgCount++;
 			return {
+				'id': msgID,
 				'time': Date(),
 				'type': type,
 				'user': users[sender].nick,
@@ -125,7 +131,8 @@ var Chat = function(){
 		},
 		parseMsg: function(key,msg){
 
-			var type = 'message';
+			var type = 'message',
+				msgID = msgCount;
 
 			users[key].state = 'active'; // Shitty quick fix for people reusing an old socket
 			users[key].lastActive = new Date();
@@ -141,6 +148,9 @@ var Chat = function(){
 				if(image_regex_match.test(msg)){
 					msg = '<a href="' + msg + '" target="_BLANK"> <img src="' + msg + '"/></a>';
 					type = 'image';
+				}else if(audio_regex_match.test(msg)){
+					msg = '<audio controls id="audioMsg'+msgID+'"><source src="'+msg+'">Your shit browser doesn\'t support HTML audio</audio>';
+					type = 'audio';
 				}else if(match_split = msg.match(youtube_regex_match)){
 					var video_id = match_split[1];
 					msg = '<iframe width="360" height="200" src="https://www.youtube.com/embed/'+video_id+'" frameborder="0" allowfullscreen></iframe>';
@@ -153,7 +163,7 @@ var Chat = function(){
 			}
 
 			if(msg.length>0){
-				this.broadcastMsg(this.buildMsg(key,type,msg));
+				this.broadcastMsg(this.buildMsg(key,type,msg,msgID));
 			}
 		},
 		parseCommand: function(key,command){
