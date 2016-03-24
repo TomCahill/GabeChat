@@ -57,12 +57,36 @@ var Chat = function(){
 	function stripHtml(str){
 		return str.replace(/<\/?([a-z][a-z0-9]*)\b[^>]*>?/gi, '').trim();
 	}
-	function isUserNickTaken(newNick){
+	function getUserByNick(name){
+		name = name.toLowerCase();
 		for(var key in users){
-			if(users[key].nick.toLowerCase()==newNick)
-				return true;
+			if(users[key].nick.toLowerCase()==name)
+				return users[key];
 		}
 		return false;
+	}
+
+	function parseMessageContent(msg){
+		msg = stripHtml(msg);
+
+		if(msg.substring(0,1)!='!'){
+			if(image_regex_match.test(msg)){
+				msg = '<a href="' + msg + '" target="_BLANK"> <img src="' + msg + '"/></a>';
+				type = 'image';
+			}else if(audio_regex_match.test(msg)){
+				msg = '<audio controls id="audioMsg'+msgID+'"><source src="'+msg+'">Your shit browser doesn\'t support HTML audio</audio>';
+				type = 'audio';
+			}else if(match_split = msg.match(youtube_regex_match)){
+				var video_id = match_split[1];
+				msg = '<iframe width="360" height="200" src="https://www.youtube.com/embed/'+video_id+'" frameborder="0" allowfullscreen></iframe>';
+				type = 'youtube';
+			}else{
+				msg =  msg.replace(link_regex_match, function(url) {
+					return '<a href="' + url + '" target="_BLANK">' + url + '</a>';
+				});
+			}
+		}
+		return msg;
 	}
 
 	return {
@@ -137,44 +161,53 @@ var Chat = function(){
 			users[key].state = 'active'; // Shitty quick fix for people reusing an old socket
 			users[key].lastActive = new Date();
 
-			if(msg.substring(0,1)=='/'){
+			if(msg.substring(0,4)=='/all'){
+				msg = msg.substring(4, msg.length);
+			}
+
+			if(msg.substring(0,1)=='/'){ // Ignore the all command
 				this.parseCommand(key,msg.substring(1,msg.length));
 				return;
 			}
 
-			msg = stripHtml(msg);
-
-			if(msg.substring(0,1)!='!'){
-				if(image_regex_match.test(msg)){
-					msg = '<a href="' + msg + '" target="_BLANK"> <img src="' + msg + '"/></a>';
-					type = 'image';
-				}else if(audio_regex_match.test(msg)){
-					msg = '<audio controls id="audioMsg'+msgID+'"><source src="'+msg+'">Your shit browser doesn\'t support HTML audio</audio>';
-					type = 'audio';
-				}else if(match_split = msg.match(youtube_regex_match)){
-					var video_id = match_split[1];
-					msg = '<iframe width="360" height="200" src="https://www.youtube.com/embed/'+video_id+'" frameborder="0" allowfullscreen></iframe>';
-					type = 'youtube';
-				}else{
-					msg =  msg.replace(link_regex_match, function(url) {
-						return '<a href="' + url + '" target="_BLANK">' + url + '</a>';
-					});
-				}
-			}
+			msg = parseMessageContent(msg);
 
 			if(msg.length>0){
-				this.broadcastMsg(this.buildMsg(key,type,msg,msgID));
+				this.broadcastMsg(this.buildMsg(key, type, msg, msgID));
 			}
 		},
-		parseCommand: function(key,command){
-			if(command.length>0){
-				command = command.split(' ');
-				switch(command[0].toLowerCase()){
-					case 'nick':
-						if(typeof command[1]!='undefined' && command[1].length>0){
-							var oldNick = users[key].nick, newName = stripHtml(command[1]);
+		parseCommand: function(key,line){
+			if(line.length>0){
+				arguments = line.match(/\w+|"(?:\\"|[^"])+"/g);
+				// Loop through and strip quotes
+				for(var i in arguments){
+					arguments[i] = arguments[i].replace(/"/g,"");
+				}
+				switch(arguments[0].toLowerCase()){
+					case 'pm':
+						if((typeof arguments[1]!='undefined' && arguments[1].length>0) && 
+							(typeof arguments[2]!='undefined' && arguments[2].length>0)){
+							var message = arguments[2];
 
-							if(isUserNickTaken(newName.toLowerCase())){
+							var targetUser = getUserByNick(arguments[1]);
+							if(targetUser==false){
+								this.sendMsg(key, this.buildMsg('server','status', 'We couldn\'t find a user with that name'));
+								break;
+							}
+
+							message = parseMessageContent(message);
+
+							this.sendMsg(key, this.buildMsg(key,'private', message));
+							this.sendMsg(targetUser.key, this.buildMsg(key,'private', message));
+						}
+					break;
+					case 'nick':
+						// TODO: Limit name length
+						if(typeof arguments[1]!='undefined' && arguments[1].length>0){
+							var oldNick = users[key].nick, 
+								newName = stripHtml(arguments[1]).replace(/\s/g,'');
+
+							if(getUserByNick(newName)!=false){
 								this.sendMsg(key,this.buildMsg('server','status', 'Username has already been taken'));
 								break;
 							}
@@ -184,15 +217,15 @@ var Chat = function(){
 						}
 					break;
 					case 'whois':
-						if(typeof command[1]!='undefined' && command[1].length>0){
-							var name = stripHtml(command[1]);
+						if(typeof arguments[1]!='undefined' && arguments[1].length>0){
+							var name = stripHtml(arguments[1]);
 							this.broadcastMsg(this.buildMsg('server','status', 'Who is '+name+'? '+name+' is a faggot'));
 						}
 					break;
 					case 'setcolour':
-						if(typeof command[1]!='undefined' && command[1].length>0){
+						if(typeof arguments[1]!='undefined' && arguments[1].length>0){
 							// Parse hex code
-							users[key].colour = stripHtml(command[1]);
+							users[key].colour = stripHtml(arguments[1]);
 							this.sendMsg(key,this.buildMsg('server','status', 'Your text colour has changed'));
 						}
 					break;
@@ -203,7 +236,7 @@ var Chat = function(){
 							user_string_return+=sep+users[key].nick;
 							i++;
 						}
-						this.broadcastMsg(this.buildMsg('server','status', user_string_return));
+						this.sendMsg(key,this.buildMsg('server','status', user_string_return));
 					break;
 				}
 			}

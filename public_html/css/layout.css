@@ -65,8 +65,8 @@ body{
 	border:1px solid #282F33;
 }
 
-.chat-wrapper .chat-window ul li.status .from{
-	color:#838383;
+.chat-wrapper .chat-window ul li.private .from{
+	color: #2196F3;
 }
 
 .chat-wrapper .chat-input{
@@ -82,6 +82,14 @@ body{
 	padding: 5px;
 	margin-bottom: 0px;
 }
+.chat-wrapper .chat-input .chat-target{
+	float: left;
+	color: #FFF;
+	width: 5%;
+	text-align: center;
+	font-size: 15px;
+	padding: 8px 0px;
+}
 .chat-wrapper .chat-input input{
 	border: 1px solid #cfdae1;
 	font: 13px Consolas, monospace;
@@ -90,7 +98,8 @@ body{
 	outline: none;
 	padding: 0 12px;
 	-webkit-appearance: none;
-	width: 100%;
+	width: 95%;
+	float: right;
 }
 
 .chat-wrapper .chat-userlist{
@@ -129,6 +138,15 @@ body{
 }
 .chat-wrapper .chat-userlist-icons i.disabled{
 	color: #616161;
+}
+
+.clear, .clearfix:after{
+	content: ' ';
+	display: block;
+	width: 0px;
+	height: 0px;
+	overflow: hidden;
+	clear: both;
 }
 
 @media only screen and (max-width: 767px) {

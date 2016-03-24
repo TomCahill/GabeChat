@@ -28,6 +28,8 @@ var gabe_chat = function(name){
 		isSilentClient = false,
 		isShowYoutubeEmbedded = true;
 
+	var availableCommands = ['all', 'pm', 'nick', 'whois', 'setcolour', 'users'];
+
 	$(window).resize(function(){
 		var h = $(window).outerHeight()-($('.chat-wrapper .chat-header').outerHeight()+$('.chat-wrapper .chat-input').outerHeight())-10;
 		$('.chat-wrapper .chat-window').css('height',h+'px');
@@ -73,10 +75,15 @@ var gabe_chat = function(name){
 		date.setTime(date.getTime()+(30*24*60*60*1000));
 		document.cookie = 'gabeChat='+data+'; expires='+date.toGMTString()+'; path=/'
 	});
-	$('.chat-input-wrapper').submit(function(){
-		socket.emit('msg',$('.chat-input-wrapper input').val());
+	$('.chat-input-wrapper').submit(function(e){
+		e.preventDefault();
+		preEmitMessage($('.chat-input-wrapper input').val());
+		$('.chat-target').text('/all');
 		$('.chat-input-wrapper input').val('');
 		return false;
+	});
+	$('.chat-input-wrapper input').keyup(function(e){
+		checkStrForCommand($('.chat-input-wrapper input').val());
 	});
 	socket.on('updateUsers', function(data){
 		users = data;
@@ -99,6 +106,25 @@ var gabe_chat = function(name){
 
 	function loop(){
 		updateUserListTimes();
+	}
+	function checkStrForCommand(str){
+		if(str.length>0 && str.substring(0,1)=='/'){
+			arguments = str.match(/\w+|"(?:\\"|[^"])+"/g);
+			if(arguments){
+				if(typeof arguments[0]!='undefined' && arguments[0].length>0){
+					if(availableCommands.indexOf(arguments[0])>=0){
+						var command = '/'+arguments[0];
+						$('.chat-input-wrapper input').val($('.chat-input-wrapper input').val().replace(command, ''));
+						$('.chat-target').text(command);
+					}
+				}
+			}
+		}
+	}
+	function preEmitMessage(msg){
+		// Do some pre shit here
+			// Try to wrap the message with quotes
+		socket.emit('msg', $('.chat-target').text()+' '+$('.chat-input-wrapper input').val());
 	}
 	function updateTitleCount(int){
 		$('head title').text(appTitle+' ('+int+')');
