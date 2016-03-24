@@ -65,6 +65,9 @@ body{
 	border:1px solid #282F33;
 }
 
+.chat-wrapper .chat-window ul li.status .from{
+	color: #838383;
+}
 .chat-wrapper .chat-window ul li.private .from{
 	color: #2196F3;
 }
