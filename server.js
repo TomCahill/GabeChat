@@ -54,6 +54,8 @@ var Chat = function(){
 	msgCount = 0,
 	userCount = 0;
 
+	var availableCommands = ['all', 'pm', 'nick', 'whois', 'setcolour', 'users'];
+
 	function stripHtml(str){
 		return str.replace(/<\/?([a-z][a-z0-9]*)\b[^>]*>?/gi, '').trim();
 	}
@@ -271,6 +273,7 @@ io.on('connection', function(client){
 	/* You can look now */
 
 	user.client.emit('client_key',user.key);
+	user.client.emit('availableCommands', availableCommands);
 
 	user.client.on('disconnect',function(reason){
 		chat_server.disconnectUser(user,reason);

@@ -18,78 +18,144 @@ function timeSince(date) {
     return Math.floor(seconds) + " secs";
 }
 
-var gabe_chat = function(name){
+/**
+ * GabeChat
+ * Main chat class to manage everything
+ *
+ * @returns {object} self
+ */
+var GabeChat = function(name){
+	var self = this,
+		socket = null,
+		chat_users = [],
+		appTitle = name || 'GabeChat';
 
-	var socket=null,
-		users=[],
-		appTitle = name || 'Gabe Chat',
-		isFocused = true,
+	var isFocused = false,
 		lostFocusCount = 0,
 		isSilentClient = false,
 		isShowYoutubeEmbedded = true;
 
-	var availableCommands = ['all', 'pm', 'nick', 'whois', 'setcolour', 'users'];
+	var availableCommands = [];
 
-	$(window).resize(function(){
-		var h = $(window).outerHeight()-($('.chat-wrapper .chat-header').outerHeight()+$('.chat-wrapper .chat-input').outerHeight())-10;
-		$('.chat-wrapper .chat-window').css('height',h+'px');
-	});
-	$(window).resize();
+	/**
+	 * construct
+	 * Function is called when class is created.
+	 *
+	 * @returns {Object} self - Returns the current class
+	 */
+	function _construct(){
 
-	$('.btn-sound').click(function(){
-		if($(this).hasClass('fa-volume-up')){
-			$(this).removeClass('fa-volume-up');
-			$(this).addClass('fa-volume-off');
-			isSilentClient=true;
-			document.getElementById('chatNotification').volume = 0;
-		}else{
-			$(this).removeClass('fa-volume-off');
-			$(this).addClass('fa-volume-up');
-			isSilentClient=false;
-			document.getElementById('chatNotification').volume = 0.6;
-		}
-	});
-	$('.btn-youtube').click(function(){
-		if(!isShowYoutubeEmbedded){
-			$(this).removeClass('disabled');
-			isShowYoutubeEmbedded = true;
-		}else{
-			$(this).addClass('disabled');
-			isShowYoutubeEmbedded = false;
-		}
-	});
+		// Init shit
+		socket = io.connect(':8080');
 
-	$(window).focus(function(){
-		isFocused = true;
-		switchFav('fav1');
-		lostFocusCount=0;
-		updateTitleCount(lostFocusCount);
-	}).blur(function(){
-		isFocused = false;
-	});
+		init();
 
-	var socket = io.connect(':8080');
-	socket.on('client_key', function(data){
-		console.log(data);
+		return self;
+	}
+
+	/**
+	 * init
+	 * Initialise some of the dependencies (jQuery and socketIO Listeners).
+	 *
+	 * @returns {void}
+	 */
+	function init(){
+		socketIOListeners();
+		jQueryListeners();
+		updateUserListTimes();
+	}
+
+	/**
+	 * jQueryListeners
+	 * Initialise the jQuery listeners for the UI
+	 *
+	 * @returns {void}
+	 */
+	function jQueryListeners(){
+		// jQuery Listeners
+		$(window).resize(function(){
+			var h = $(window).outerHeight()-($('.chat-wrapper .chat-header').outerHeight()+$('.chat-wrapper .chat-input').outerHeight())-10;
+			$('.chat-wrapper .chat-window').css('height',h+'px');
+		});
+		$(window).resize();
+		
+		$(window).focus(function(){
+			isFocused = true;
+			switchFav('fav1');
+			lostFocusCount=0;
+			updateTitleCount(lostFocusCount);
+		}).blur(function(){
+			isFocused = false;
+		});
+
+		// jQuery Listeners UI
+		$('.btn-sound').click(function(){
+			if($(this).hasClass('fa-volume-up')){
+				$(this).removeClass('fa-volume-up');
+				$(this).addClass('fa-volume-off');
+				isSilentClient=true;
+				document.getElementById('chatNotification').volume = 0;
+			}else{
+				$(this).removeClass('fa-volume-off');
+				$(this).addClass('fa-volume-up');
+				isSilentClient=false;
+				document.getElementById('chatNotification').volume = 0.6;
+			}
+		});
+		$('.btn-youtube').click(function(){
+			if(!isShowYoutubeEmbedded){
+				$(this).removeClass('disabled');
+				isShowYoutubeEmbedded = true;
+			}else{
+				$(this).addClass('disabled');
+				isShowYoutubeEmbedded = false;
+			}
+		});
+		// Input
+		$('.chat-input-wrapper input').keyup(function(e){
+			checkStrForCommand($('.chat-input-wrapper input').val());
+		});
+		$('.chat-input-wrapper').submit(function(e){
+			e.preventDefault();
+			preEmitMessage($('.chat-input-wrapper input').val());
+			$('.chat-target').text('/all');
+			$('.chat-input-wrapper input').val('');
+			return false;
+		});
+	}
+	/**
+	 * socketIOListeners
+	 * Initialise socket IO listeners
+	 *
+	 * @returns {void}
+	 */
+	function socketIOListeners(){
+		socket.on('client_key', onSocketConnect);
+		socket.on('updateUsers', onUpdateUsers);
+		socket.on('msg', onMessageReceive);
+	}
+
+	/**
+	 * onSocketConnect
+	 * Method is called when socket connection is opened
+	 *
+	 * @param {String} key - unique string given by the server to identify the user 
+	 * @returns {void}
+	 */
+	function onSocketConnect(key){
+		console.log(key);
 		var date = new Date();
 		date.setTime(date.getTime()+(30*24*60*60*1000));
-		document.cookie = 'gabeChat='+data+'; expires='+date.toGMTString()+'; path=/'
-	});
-	$('.chat-input-wrapper').submit(function(e){
-		e.preventDefault();
-		preEmitMessage($('.chat-input-wrapper input').val());
-		$('.chat-target').text('/all');
-		$('.chat-input-wrapper input').val('');
-		return false;
-	});
-	$('.chat-input-wrapper input').keyup(function(e){
-		checkStrForCommand($('.chat-input-wrapper input').val());
-	});
-	socket.on('updateUsers', function(data){
-		users = data;
-		updateUserList();
-	});
-	socket.on('msg', function(data){
+		document.cookie = 'gabeChat='+key+'; expires='+date.toGMTString()+'; path=/'
+	}
+	/**
+	 * onMessageReceive
+	 * Method is called when a message is received from the server
+	 *
+	 * @param {object} data - message data object
+	 * @returns {void}
+	 */
+	function onMessageReceive(data){
 		if(!isFocused){
 			switchFav('fav2');
 			lostFocusCount++;
@@ -98,61 +164,30 @@ var gabe_chat = function(name){
 			document.getElementById('chatNotification').play();
 		}
 		parseMessageData(data);
-	});
+	}
+	/**
+	 * onUpdateUsers
+	 * Method is called when the server user list has been updated (connected/disconnected) users
+	 *
+	 * @param {object} data - list of users currently connected to the server
+	 * @returns {void}
+	 */
+	function onUpdateUsers(data){
+		chat_users = data;
+		updateUserListDOM();
+	}
 
-	setInterval(function(){
-		loop();
-	},1000);
+	/**
+	 ** Message IN
+	 */
 
-	function loop(){
-		updateUserListTimes();
-	}
-	function checkStrForCommand(str){
-		if(str.length>0 && str.substring(0,1)=='/'){
-			arguments = str.match(/\w+|"(?:\\"|[^"])+"/g);
-			if(arguments){
-				if(typeof arguments[0]!='undefined' && arguments[0].length>0){
-					if(availableCommands.indexOf(arguments[0])>=0){
-						var command = '/'+arguments[0];
-						$('.chat-input-wrapper input').val($('.chat-input-wrapper input').val().replace(command, ''));
-						$('.chat-target').text(command);
-					}
-				}
-			}
-		}
-	}
-	function preEmitMessage(msg){
-		// Do some pre shit here
-			// Try to wrap the message with quotes
-		socket.emit('msg', $('.chat-target').text()+' '+$('.chat-input-wrapper input').val());
-	}
-	function updateTitleCount(int){
-		$('head title').text(appTitle+' ('+int+')');
-	}
-	function switchFav(fav){
-		$('#fav').attr('href','images/'+fav+'.jpg');
-	}
-	function updateUserList(){
-		var user_list = '';
-		for(var i=0;i<users.length;i++){
-			user_list+='<li class="user'+users[i].id+' title="'+users[i].ip+'">'+users[i].nick+' <span class="lastActive">0 secs</span></li>';
-		}
-		$('.chat-userlist ul').html(user_list);
-
-		// Stupid code
-		$('.chat-userlist li.user0').click(function(){
-			if($('.chat-window').hasClass('gaben')){
-				$('.chat-window').removeClass('gaben');
-			}else{
-				$('.chat-window').addClass('gaben');
-			}
-		});
-	}
-	function updateUserListTimes(){
-		for(var i=0;i<users.length;i++){
-			$('.user'+users[i].id+' .lastActive').html(timeSince(users[i].lastActive));
-		}
-	}
+	/**
+	 * parseMessageData
+	 * Catch message for final checks before updating the chat window
+	 *
+	 * @param {object} data - message data object
+	 * @returns {void}
+	 */
 	function parseMessageData(data){
 		if(data.type=='youtube' && !isShowYoutubeEmbedded){
 			var video_url = $(data.msg).attr('src');
@@ -162,9 +197,16 @@ var gabe_chat = function(name){
 
 		}
 
-		addStatus(data);
+		addMessage(data);
 	}
-	function addStatus(data){
+	/**
+	 * addMessage
+	 * Add the message data to the chat window
+	 *
+	 * @param {object} data - message data object
+	 * @returns {void}
+	 */
+	function addMessage(data){
 		var time = new Date(data.time),
 			h=(time.getHours()<10) ? '0'+time.getHours() : time.getHours(),
 			m=(time.getMinutes()<10) ? '0'+time.getMinutes() : time.getMinutes(),
@@ -182,4 +224,103 @@ var gabe_chat = function(name){
 
 		$('.chat-window').scrollTop($('.chat-window ul').height());
 	}
+
+	/**
+	 ** Message OUT
+	 */
+
+	/**
+	 * checkStrForCommand
+	 * Check the message against available commands and move to "chat target" if matched
+	 *
+	 * @param {string} str - raw user chat input
+	 * @returns {void}
+	 */
+	function checkStrForCommand(str){
+		if(str.length>0 && str.substring(0,1)=='/'){
+			arguments = str.match(/\w+|"(?:\\"|[^"])+"/g);
+			if(arguments){
+				if(typeof arguments[0]!='undefined' && arguments[0].length>0){
+					if(availableCommands.indexOf(arguments[0])>=0){
+						var command = '/'+arguments[0];
+						$('.chat-input-wrapper input').val($('.chat-input-wrapper input').val().replace(command, ''));
+						$('.chat-target').text(command);
+					}
+				}
+			}
+		}
+	}
+	/**
+	 * preEmitMessage
+	 * Final check of users message before emitting to the server
+	 *
+	 * @param {string} msg - raw user chat input
+	 * @returns {void}
+	 */
+	function preEmitMessage(msg){
+		messageEmit($('.chat-target').text()+' '+$('.chat-input-wrapper input').val());
+	}
+	/**
+	 * messageEmit
+	 * Pass message string to the server
+	 *
+	 * @param {string} message - checked user input
+	 * @returns {void}
+	 */
+	function messageEmit(message){
+		socket.emit('msg', message);
+	}
+
+	/**
+	 ** Useful Shit
+	 */
+
+	/**
+	 * updateTitleCount
+	 * Update the message count in the DOM title
+	 *
+	 * @param {int} int - number of messages
+	 * @returns {void}
+	 */
+	function updateTitleCount(int){
+		$('head title').text(appTitle+' ('+int+')');
+	}
+	/**
+	 * updateTitleCount
+	 * Update the current favicon for the filename provided
+	 *
+	 * @param {string} fav - image filename
+	 * @returns {void}
+	 */
+	function switchFav(fav){
+		$('#fav').attr('href','images/'+fav+'.jpg');
+	}
+	/**
+	 * updateUserListTimes
+	 * Recursive loop to update the users time since last message
+	 *
+	 * @returns {void}
+	 */
+	function updateUserListTimes(){
+		for(var i=0;i<chat_users.length;i++){
+			$('.user'+chat_users[i].id+' .lastActive').html(timeSince(chat_users[i].lastActive));
+		}
+
+		setTimeout(updateUserListTimes, 1000);
+	}
+	/**
+	 * updateUserListDOM
+	 * Create a new userlist based on the current chat_users
+	 *
+	 * @returns {void}
+	 */
+	function updateUserListDOM(){
+		var user_list = '';
+		for(var i=0;i<chat_users.length;i++){
+			user_list+='<li class="user'+chat_users[i].id+' title="'+chat_users[i].ip+'">'+chat_users[i].nick+' <span class="lastActive">0 secs</span></li>';
+		}
+		$('.chat-userlist ul').html(user_list);
+	}
+
+	return _construct();
 }
