@@ -77,6 +77,7 @@ var GabeChat_Client = function(name){
 		$(window).resize(function(){
 			var h = $(window).outerHeight()-($('.chat-wrapper .chat-header').outerHeight()+$('.chat-wrapper .chat-input').outerHeight())-10;
 			$('.chat-wrapper .chat-window').css('height',h+'px');
+			resizeChatInput();
 		});
 		$(window).resize();
 		
@@ -87,6 +88,10 @@ var GabeChat_Client = function(name){
 			updateTitleCount(lostFocusCount);
 		}).blur(function(){
 			isFocused = false;
+		});
+		$('.chat-wrapper').click(function(){
+			if(!isFocused)
+				$(window).triggerHandler('focus');
 		});
 
 		// jQuery Listeners UI
