@@ -24,7 +24,7 @@ function timeSince(date) {
  *
  * @returns {object} self
  */
-var GabeChat = function(name){
+var GabeChat_Client = function(name){
 	var self = this,
 		socket = null,
 		chat_users = [],
@@ -35,7 +35,7 @@ var GabeChat = function(name){
 		isSilentClient = false,
 		isShowYoutubeEmbedded = true;
 
-	var availableCommands = [];
+	var AvailableCommands = [];
 
 	/**
 	 * construct
@@ -47,6 +47,7 @@ var GabeChat = function(name){
 
 		// Init shit
 		socket = io.connect(':8080');
+		setChatInputPrefix('/all');
 
 		init();
 
@@ -118,7 +119,7 @@ var GabeChat = function(name){
 		$('.chat-input-wrapper').submit(function(e){
 			e.preventDefault();
 			preEmitMessage($('.chat-input-wrapper input').val());
-			$('.chat-target').text('/all');
+			setChatInputPrefix('/all');
 			$('.chat-input-wrapper input').val('');
 			return false;
 		});
@@ -132,6 +133,7 @@ var GabeChat = function(name){
 	function socketIOListeners(){
 		socket.on('client_key', onSocketConnect);
 		socket.on('updateUsers', onUpdateUsers);
+		socket.on('availableCommands', onAvailableCommands);
 		socket.on('msg', onMessageReceive);
 	}
 
@@ -147,6 +149,27 @@ var GabeChat = function(name){
 		var date = new Date();
 		date.setTime(date.getTime()+(30*24*60*60*1000));
 		document.cookie = 'gabeChat='+key+'; expires='+date.toGMTString()+'; path=/'
+	}
+	/**
+	 * onAvailableCommands
+	 * Fetch avaiable server commands
+	 *
+	 * @param {object} data - list of server commands
+	 * @returns {void}
+	 */
+	function onAvailableCommands(data){
+		AvailableCommands = data;
+	}
+	/**
+	 * onUpdateUsers
+	 * Method is called when the server user list has been updated (connected/disconnected) users
+	 *
+	 * @param {object} data - list of users currently connected to the server
+	 * @returns {void}
+	 */
+	function onUpdateUsers(data){
+		chat_users = data;
+		updateUserListDOM();
 	}
 	/**
 	 * onMessageReceive
@@ -165,17 +188,6 @@ var GabeChat = function(name){
 		}
 		parseMessageData(data);
 	}
-	/**
-	 * onUpdateUsers
-	 * Method is called when the server user list has been updated (connected/disconnected) users
-	 *
-	 * @param {object} data - list of users currently connected to the server
-	 * @returns {void}
-	 */
-	function onUpdateUsers(data){
-		chat_users = data;
-		updateUserListDOM();
-	}
 
 	/**
 	 ** Message IN
@@ -193,9 +205,7 @@ var GabeChat = function(name){
 			var video_url = $(data.msg).attr('src');
 			data.msg = 'You have embedded videos off: <a href="'+video_url+'" target="_BLANK">'+video_url+'</a>';
 			data.type = 'message';
-		}else if(data.type=='audio' && !isSilentClient){
-
-		}
+		}else if(data.type=='audio' && !isSilentClient){ }
 
 		addMessage(data);
 	}
@@ -241,10 +251,10 @@ var GabeChat = function(name){
 			arguments = str.match(/\w+|"(?:\\"|[^"])+"/g);
 			if(arguments){
 				if(typeof arguments[0]!='undefined' && arguments[0].length>0){
-					if(availableCommands.indexOf(arguments[0])>=0){
+					if(AvailableCommands.indexOf(arguments[0])>=0){
 						var command = '/'+arguments[0];
 						$('.chat-input-wrapper input').val($('.chat-input-wrapper input').val().replace(command, ''));
-						$('.chat-target').text(command);
+						setChatInputPrefix(command);
 					}
 				}
 			}
@@ -286,7 +296,7 @@ var GabeChat = function(name){
 		$('head title').text(appTitle+' ('+int+')');
 	}
 	/**
-	 * updateTitleCount
+	 * switchFav
 	 * Update the current favicon for the filename provided
 	 *
 	 * @param {string} fav - image filename
@@ -294,6 +304,28 @@ var GabeChat = function(name){
 	 */
 	function switchFav(fav){
 		$('#fav').attr('href','images/'+fav+'.jpg');
+	}
+	/**
+	 * setChatInputPrefix
+	 * Change the chat input prefix
+	 *
+	 * @param {string} prefix
+	 * @returns {void}
+	 */
+	function setChatInputPrefix(prefix){
+		$('.chat-target').text(prefix);
+		resizeChatInput();
+	}
+	/**
+	 * resizeChatInput
+	 * Resize the chat input taking into account the prefix size
+	 *
+	 * @param {string} fav - image filename
+	 * @returns {void}
+	 */
+	function resizeChatInput(){
+		$('.chat-wrapper .chat-input .chat-target').width('auto');
+		$('.chat-input-wrapper input').outerWidth($('.chat-input-wrapper').width()-$('.chat-wrapper .chat-input .chat-target').outerWidth()-2);
 	}
 	/**
 	 * updateUserListTimes

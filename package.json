@@ -6,6 +6,7 @@
   "dependencies": {
     "express": "*",
     "node-uuid": "^1.4.1",
-    "socket.io": "*"
+    "socket.io": "*",
+    "extend": "*"
   }
 }
