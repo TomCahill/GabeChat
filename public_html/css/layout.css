@@ -144,6 +144,20 @@ body{
 	color: #616161;
 }
 
+
+.ui-menu{
+    background: #32393E;
+    color: #FFF;
+    margin-top: -2px;
+}
+.ui-menu .ui-menu-item{
+	padding: 5px 10px;
+}
+.ui-menu .ui-state-focus, .ui-menu .ui-state-active{
+	color: #F59038;
+	margin: 0px;
+}
+
 .clear, .clearfix:after{
 	content: ' ';
 	display: block;

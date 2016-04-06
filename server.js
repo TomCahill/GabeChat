@@ -67,7 +67,7 @@ var GabeChat_Server = function(){
 			userCount: 0
 		},
 		ServerUser = false,
-		AvailableCommands = ['all', 'pm', 'nick', 'whois', 'users'];
+		AvailableCommands = ['all', 'nick', 'whois', 'users'];
 
 
 	function _construct(){
@@ -108,8 +108,8 @@ var GabeChat_Server = function(){
 		if(!user)
 			user = userCreate(UUID(), Client);
 
-		if(Client)
-			userAssignSocketIOClientListners(user)
+		if(user.client)
+			userAssignSocketIOClientListners(user);
 	}
 	function userDisconnect(user, reason){
 
@@ -189,7 +189,7 @@ var GabeChat_Server = function(){
 	}
 
 	function sendMessage(Recipient, Message){
-		if(Message)
+		if(Message && Recipient.key!='server')
 			Recipient.client.emit('msg', Message);
 	}
 	function broadcastMessage(Message){
@@ -254,28 +254,21 @@ var GabeChat_Server = function(){
 			for(var i in arguments){
 				arguments[i] = arguments[i].replace(/"/g,"");
 			}
+
+			if(getUserByNick(arguments[0])){
+				var targetUser  = getUserByNick(arguments[0]),
+					messageStr = Line.replace(arguments[0], '').trim();
+
+				sendMessage(User, buildMessage(User, messageStr, {
+					'type': 'private'
+				}));
+				sendMessage(targetUser, buildMessage(User, messageStr, {
+					'type': 'private'
+				}));
+				return;
+			}
+
 			switch(arguments[0].toLowerCase()){
-				case 'pm':
-					if((typeof arguments[1]!='undefined' && arguments[1].length>0) && 
-						(typeof arguments[2]!='undefined' && arguments[2].length>0)){
-						var messageStr = arguments[2],
-							targetUser = getUserByNick(arguments[1]);
-
-						if(targetUser==false){
-							sendMessage(User, buildMessage(ServerUser, 'We couldn\'t find a user with that name', {
-								'type': 'status'
-							}));
-							break;
-						}
-
-						sendMessage(User, buildMessage(User, messageStr, {
-							'type': 'private'
-						}));
-						sendMessage(targetUser, buildMessage(User, messageStr, {
-							'type': 'private'
-						}));
-					}
-				break;
 				case 'nick':
 					// TODO: Limit name length
 					if(typeof arguments[1]!='undefined' && arguments[1].length>0){
@@ -283,13 +276,20 @@ var GabeChat_Server = function(){
 							newName = stripHtml(arguments[1]).replace(/\s/g,'');
 
 						if(getUserByNick(newName)!=false){
-
-							sendMessage(User, buildMessage(ServerUser, 'Username has already been taken', {
+							sendMessage(User, buildMessage(ServerUser, 'Nickname has already been taken', {
 								'type': 'status'
 							}));
 
 							break;
 						}
+						if(AvailableCommands.indexOf(newName.toLowerCase())>=0){
+							sendMessage(User, buildMessage(ServerUser, 'You cannot share an name with an existing server command', {
+								'type': 'status'
+							}));
+
+							break;
+						}
+
 						User.nick = newName;
 
 						broadcastMessage(buildMessage(ServerUser, oldNick+' renamed to '+newName, {

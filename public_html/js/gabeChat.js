@@ -35,7 +35,8 @@ var GabeChat_Client = function(name){
 		isSilentClient = false,
 		isShowYoutubeEmbedded = true;
 
-	var AvailableCommands = [];
+	var ServerCommands = [],
+		AvailableCommands = [];
 
 	/**
 	 * construct
@@ -64,6 +65,7 @@ var GabeChat_Client = function(name){
 		socketIOListeners();
 		jQueryListeners();
 		updateUserListTimes();
+		buildAvailableCommands();
 	}
 
 	/**
@@ -117,8 +119,14 @@ var GabeChat_Client = function(name){
 				isShowYoutubeEmbedded = false;
 			}
 		});
+
+		$('.chat-input-wrapper input').autocomplete({
+			source: AvailableCommands,
+			position: { my: "left bottom", at: "left top", collision: "flip" }
+		});
+
 		// Input
-		$('.chat-input-wrapper input').keyup(function(e){
+		$('.chat-input-wrapper input').on('input propertychange paste', function(e){
 			checkStrForCommand($('.chat-input-wrapper input').val());
 		});
 		$('.chat-input-wrapper').submit(function(e){
@@ -163,7 +171,7 @@ var GabeChat_Client = function(name){
 	 * @returns {void}
 	 */
 	function onAvailableCommands(data){
-		AvailableCommands = data;
+		ServerCommands = data;
 	}
 	/**
 	 * onUpdateUsers
@@ -256,9 +264,9 @@ var GabeChat_Client = function(name){
 			arguments = str.match(/\w+|"(?:\\"|[^"])+"/g);
 			if(arguments){
 				if(typeof arguments[0]!='undefined' && arguments[0].length>0){
-					if(AvailableCommands.indexOf(arguments[0])>=0){
-						var command = '/'+arguments[0];
-						$('.chat-input-wrapper input').val($('.chat-input-wrapper input').val().replace(command, ''));
+					var command = '/'+arguments[0];
+					if(AvailableCommands.indexOf(command)>=0){
+						$('.chat-input-wrapper input').val($('.chat-input-wrapper input').val().replace(command, '').trim());
 						setChatInputPrefix(command);
 					}
 				}
@@ -289,6 +297,26 @@ var GabeChat_Client = function(name){
 	/**
 	 ** Useful Shit
 	 */
+
+	function buildAvailableCommands(){
+		// Combine users with server commands for AvailableCommands
+		if(ServerCommands.length>0 && chat_users.length>0){
+			var flatusers = []; 
+			for(var i in chat_users){
+				flatusers.push(chat_users[i].nick.toLowerCase());
+			}
+			AvailableCommands = ServerCommands.concat(flatusers);
+			// Prepend forward slash
+			for(var i in AvailableCommands){
+				AvailableCommands[i]='/'+AvailableCommands[i];
+			}
+
+			$('.chat-input-wrapper input').autocomplete("option", { source: AvailableCommands });
+		}else{
+			// Lists haven't been loaded check again
+			setTimeout(buildAvailableCommands, 1000);
+		}
+	}
 
 	/**
 	 * updateTitleCount
