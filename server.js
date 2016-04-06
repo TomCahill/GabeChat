@@ -36,7 +36,7 @@ var GabeChat_User = function(ID, Key, Client, Options){
 	var Defaults = {
 		clientid: ID,
 		key: Key,
-		nick: 'Gaben '+ID,
+		nick: 'Gaben'+ID,
 		colour: '#333',
 		ip: false,
 		lastActive: new Date(),
@@ -73,7 +73,7 @@ var GabeChat_Server = function(){
 	function _construct(){
 
 		ServerUser = userCreate('server', false, {
-			'nick': 'Gabe Newell',
+			'nick': 'GabeNewell',
 			'colour': '#333',
 			'ip': 'Unknown',
 			'state': 'active'
