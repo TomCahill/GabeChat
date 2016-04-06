@@ -35,7 +35,8 @@ var GabeChat_Client = function(name){
 		isSilentClient = false,
 		isShowYoutubeEmbedded = true;
 
-	var ServerCommands = [],
+	var CommandListFirstLoad = false,
+		ServerCommands = [],
 		AvailableCommands = [];
 
 	/**
@@ -182,6 +183,8 @@ var GabeChat_Client = function(name){
 	 */
 	function onUpdateUsers(data){
 		chat_users = data;
+		if(CommandListFirstLoad)
+			buildAvailableCommands();
 		updateUserListDOM();
 	}
 	/**
@@ -301,6 +304,7 @@ var GabeChat_Client = function(name){
 	function buildAvailableCommands(){
 		// Combine users with server commands for AvailableCommands
 		if(ServerCommands.length>0 && chat_users.length>0){
+			CommandListFirstLoad = true;
 			var flatusers = []; 
 			for(var i in chat_users){
 				flatusers.push(chat_users[i].nick.toLowerCase());
