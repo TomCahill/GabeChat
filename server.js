@@ -18,7 +18,13 @@ function addConsoleLog(str){
 	console.log(t.getHours()+':'+t.getMinutes()+':'+t.getSeconds()+' - '+str);
 }
 function stripHtml(Str){
-	return Str.replace(/<\/?([a-z][a-z0-9]*)\b[^>]*>?/gi, '').trim();
+	//return Str.replace(/<\/?([a-z][a-z0-9]*)\b[^>]*>?/gi, '').trim();
+
+	var encodedStr = Str.replace(/[\u00A0-\u9999<>\&]/gim, function(i) {
+	   return '&#'+i.charCodeAt(0)+';';
+	});
+
+	return encodedStr.trim();
 }
 function getCookieFromStr(cookie_name,str){
 	if(typeof str != 'undefined' && str.length>0){
