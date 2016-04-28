@@ -11,6 +11,7 @@
 		<script type="text/javascript" src="js/jQueryUI/jquery-ui.min.js"></script>
 		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 		<script type="text/javascript" src="js/gabeChat.js"></script>
+		<script type="text/javascript" src="js/src-noconflict/ace.js"></script>
 
 		<link rel="shortcut icon" id="fav" href="images/fav1.jpg">
 	</head>
@@ -21,6 +22,7 @@
 				<div class="chat-userlist-icons">
 					<i class="btn-youtube fa fa-youtube"></i>
 					<i class="btn-sound fa fa-volume-up"></i>
+					<i class="btn-script fa fa-file-code-o"></i>
 				</div>
 			</div>
 			<div class="chat-window">
@@ -34,11 +36,31 @@
 				</form>
 			</div>
 		</div>
+		<div id="editorWindow" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+			<!-- Modal content-->
+			<div class="modal-content">
+			  <div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Scripts</h4>
+			  </div>
+			  <div class="modal-body">
+				<div id="editor">	
+				</div>
+			  </div>
+			  <div class="modal-footer">
+				<input type="text" id="scriptName"/>
+				<button id="scriptSave" class="btn btn-primary"> <i class="fa fa-save"></i> Save</button>
+			  </div>
+			</div>
+		  </div>
+		</div>
 		<audio id="chatNotification" src="audio/notification.wav" preload="auto"></audio>
 		<script type="text/javascript">
 			jQuery(function($){
 				new GabeChat_Client('Lambda');
 			});
+			
 		</script>
 	</body>
 </html>
