@@ -168,7 +168,8 @@ body{
 }
 
 #editorWindow{
-	height:500px;
+	height:600px;
+	overflow:hidden;
 }
 
 #editor {
