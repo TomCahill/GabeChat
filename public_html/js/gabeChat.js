@@ -30,7 +30,7 @@ var GabeChat_Client = function(name){
 		chat_users = [],
 		appTitle = name || 'GabeChat',
 		editor = null,
-		editorDefualt = '//can add more shit up here (constructor, methods, properties)\n\npublic string RunScript()\n{\n\t\t return "";\n}\n\n//can add more shit down here (constructor, methods, properties)';
+		editorDefault = '//can add more shit up here (constructor, methods, properties)\n\npublic string RunScript()\n{\n\t\t return "";\n}\n\n//can add more shit down here (constructor, methods, properties)';
 
 	var isFocused = false,
 		lostFocusCount = 0,
