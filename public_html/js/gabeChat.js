@@ -30,7 +30,7 @@ var GabeChat_Client = function(name){
 		chat_users = [],
 		appTitle = name || 'GabeChat',
 		editor = null,
-		editorDefault = '//can add more shit up here \n//(constructor, methods, properties)\n\npublic string RunScript()\n{\n\t return "";\n}\n\n//can add more shit down here \n//(constructor, methods, properties)\n';
+		editorDefault = 'using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\nnamespace Gaben\n{\n\tpublic class Script : IScript\n\t{\n\t\tpublic string RunScript()\n\t\t{\n\t\t\t\n\t\t}\n\t}\n}';
 
 	var isFocused = false,
 		lostFocusCount = 0,
@@ -128,7 +128,7 @@ var GabeChat_Client = function(name){
 			editor.setTheme("ace/theme/sqlserver");
 			editor.getSession().setMode("ace/mode/csharp");
 			editor.setShowPrintMargin(false); 
-			editor.gotoLine(6);
+			editor.gotoLine(11);
 			$('#editorWindow').modal();
 		});
 		
@@ -144,7 +144,7 @@ var GabeChat_Client = function(name){
 		$('#scriptReset').click(function(){
 			editor.setValue(editorDefault);
 			editor.setShowPrintMargin(false); 
-			editor.gotoLine(6);
+			editor.gotoLine(11);
 		});
 
 		$('.chat-input-wrapper input').autocomplete({
