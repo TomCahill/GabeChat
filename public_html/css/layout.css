@@ -167,6 +167,21 @@ body{
 	clear: both;
 }
 
+#editorWindow{
+	height:500px;
+}
+
+#editor {
+        position:relative;
+        width:100%;
+        height:100%;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        font-size:16px;
+    }
+
 @media only screen and (max-width: 767px) {
 	.chat-wrapper .chat-userlist{
 		display: none;

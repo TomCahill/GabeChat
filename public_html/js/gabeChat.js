@@ -28,7 +28,9 @@ var GabeChat_Client = function(name){
 	var self = this,
 		socket = null,
 		chat_users = [],
-		appTitle = name || 'GabeChat';
+		appTitle = name || 'GabeChat',
+		editor = null,
+		editorDefualt = '//can add more shit up here (constructor, methods, properties)\n\npublic string RunScript()\n{\n\t\t return "";\n}\n\n//can add more shit down here (constructor, methods, properties)';
 
 	var isFocused = false,
 		lostFocusCount = 0,
@@ -120,6 +122,23 @@ var GabeChat_Client = function(name){
 				isShowYoutubeEmbedded = false;
 			}
 		});
+		$('.btn-script').click(function(){
+			editor = ace.edit("editor");
+			editor.setValue(editorDefault);
+			editor.setTheme("ace/theme/sqlserver");
+			editor.getSession().setMode("ace/mode/csharp");
+			editor.setShowPrintMargin(false); 
+			$('#editorWindow').modal();
+		});
+		
+		$('#scriptSave').click(function(){
+			var script = editor.getValue();
+			var name = $('#scriptName').val();
+			
+			var message = script + "|" + name;
+			
+			postScript(message);
+		});
 
 		$('.chat-input-wrapper input').autocomplete({
 			source: AvailableCommands,
@@ -138,6 +157,13 @@ var GabeChat_Client = function(name){
 			return false;
 		});
 	}
+	
+	function postScript(script){
+		var fullMesasge = "!script " + script;
+		
+		preEmitMessage(fullMessage);
+	}
+	
 	/**
 	 * socketIOListeners
 	 * Initialise socket IO listeners
