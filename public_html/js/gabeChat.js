@@ -131,6 +131,11 @@ var GabeChat_Client = function(name){
 			editor.gotoLine(11);
 			$('#editorWindow').modal();
 		});
+
+		$('.btn-random').click(function () {
+		   
+		    $('#random').modal();
+		});
 		
 		$('#scriptSave').click(function(){
 			var script = editor.getValue();

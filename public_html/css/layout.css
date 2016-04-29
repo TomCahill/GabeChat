@@ -172,6 +172,10 @@ body{
 	overflow:hidden;
 }
 
+#random{
+	height:600px;
+}
+
 #editor {
         position:relative;
         width:90%;
