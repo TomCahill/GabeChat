@@ -194,6 +194,7 @@ var GabeChat_Client = function(name){
 	 * @returns {void}
 	 */
 	function onSocketConnect(key){
+		console.log('Connected');
 		console.log(key);
 		var date = new Date();
 		date.setTime(date.getTime()+(30*24*60*60*1000));
