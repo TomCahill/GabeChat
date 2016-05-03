@@ -35,6 +35,7 @@ var GabeChat_Client = function(name){
 	var isFocused = false,
 		lostFocusCount = 0,
 		isSilentClient = false,
+        isVoice = false,
 		isShowYoutubeEmbedded = true;
 
 	var CommandListFirstLoad = false,
@@ -121,6 +122,14 @@ var GabeChat_Client = function(name){
 				$(this).addClass('disabled');
 				isShowYoutubeEmbedded = false;
 			}
+		});
+		$('.btn-voice').click(function () {
+		    if (!isVoice) {
+		        $(this).removeClass('disabled');
+		    } else {
+		        $(this).addClass('disabled');
+		    }
+		    isVoice = !isVoice;
 		});
 		$('.btn-script').click(function(){
 			editor = ace.edit("editor");
@@ -285,12 +294,25 @@ var GabeChat_Client = function(name){
 			'<span class="text" style="color:'+data.color+'">'+data.msg+'</span>'+
 		'</li>');
 
-		if(data.type=='audio' && !isSilentClient){
-			document.getElementById('audioMsg'+data.id).play();
+		if (data.type == 'audio' && !isSilentClient) {
+		    document.getElementById('audioMsg' + data.id).play();
 		}
+
+		if (isVoice && !data.msg.contains("http")) {
+		    var msg = new SpeechSynthesisUtterance();
+		    msg.rate = 0.7;
+		    msg.text = data.msg;
+		    speechSynthesis.speak(msg);
+		}
+		
 
 		$('.chat-window').scrollTop($('.chat-window ul').height());
 	}
+
+    //check for containing text
+	String.prototype.contains = function (text) {
+	    return this.indexOf(text) != -1;
+	};
 
 	/**
 	 ** Message OUT
