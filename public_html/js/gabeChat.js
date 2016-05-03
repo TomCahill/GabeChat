@@ -297,9 +297,9 @@ var GabeChat_Client = function(name){
 		    document.getElementById('audioMsg' + data.id).play();
 		}
 
-		if (isVoice) {
+		if (isVoice && !data.msg.contains("http")) {
 		    var msg = new SpeechSynthesisUtterance();
-		    msg.rate = 0.5;
+		    msg.rate = 0.7;
 		    msg.text = data.msg;
 		    speechSynthesis.speak(msg);
 		}
@@ -307,6 +307,11 @@ var GabeChat_Client = function(name){
 
 		$('.chat-window').scrollTop($('.chat-window ul').height());
 	}
+
+    //check for containing text
+	String.prototype.contains = function (text) {
+	    return this.indexOf(text) != -1;
+	};
 
 	/**
 	 ** Message OUT
