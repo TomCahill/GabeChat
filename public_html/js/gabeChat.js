@@ -35,7 +35,7 @@ var GabeChat_Client = function(name){
 	var isFocused = false,
 		lostFocusCount = 0,
 		isSilentClient = false,
-        isVoice = false,
+        isTextToSpeech = false,
 		isShowYoutubeEmbedded = true;
 
 	var CommandListFirstLoad = false,
@@ -123,13 +123,14 @@ var GabeChat_Client = function(name){
 				isShowYoutubeEmbedded = false;
 			}
 		});
-		$('.btn-voice').click(function () {
-		    if (!isVoice) {
+		$('.btn-voice').click(function(){
+		    if (!isTextToSpeech) {
 		        $(this).removeClass('disabled');
 		    } else {
+		    	speechSynthesis.cancel(); // Not the best place for it
 		        $(this).addClass('disabled');
 		    }
-		    isVoice = !isVoice;
+		    isTextToSpeech = !isTextToSpeech;
 		});
 		$('.btn-script').click(function(){
 			editor = ace.edit("editor");
@@ -298,13 +299,12 @@ var GabeChat_Client = function(name){
 		    document.getElementById('audioMsg' + data.id).play();
 		}
 
-		if (isVoice && !data.msg.contains("http")) {
+		if (isTextToSpeech && !isSilentClient && !data.msg.contains("http")) {
 		    var msg = new SpeechSynthesisUtterance();
 		    msg.rate = 0.7;
 		    msg.text = data.msg;
 		    speechSynthesis.speak(msg);
 		}
-		
 
 		$('.chat-window').scrollTop($('.chat-window ul').height());
 	}
