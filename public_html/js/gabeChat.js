@@ -106,6 +106,7 @@ var GabeChat_Client = function(name){
 				$(this).removeClass('fa-volume-up');
 				$(this).addClass('fa-volume-off');
 				isSilentClient=true;
+				speechSynthesis.cancel(); // Might shit self if browser doesn't support API
 				document.getElementById('chatNotification').volume = 0;
 			}else{
 				$(this).removeClass('fa-volume-off');
