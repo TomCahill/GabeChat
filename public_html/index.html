@@ -7,16 +7,12 @@
 		<link rel="stylesheet" href="css/bootstrap.min.css">
 		<link rel="stylesheet" href="css/font-awesome.min.css">
 		<link rel="stylesheet" href="css/layout.css">
-		<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
-		<script type="text/javascript" src="js/jQueryUI/jquery-ui.min.js"></script>
 		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
-		<script type="text/javascript" src="js/gabeChat.js"></script>
-		<script type="text/javascript" src="js/src-noconflict/ace.js"></script>
-		<script type="text/javascript" src="js/bootstrap.js"></script>
+        <script type="text/javascript" src="js/require.js"></script>
 
 		<link rel="shortcut icon" id="fav" href="images/fav1.jpg">
 	</head>
-	<body>
+	<body id="theBodyOfGabe">
 		<div class="chat-wrapper">
 			<div class="chat-userlist">
 				<ul></ul>
@@ -79,9 +75,48 @@
         </div>
 		<audio id="chatNotification" src="audio/notification.wav" preload="auto"></audio>
 		<script type="text/javascript">
-			jQuery(function($){
-				new GabeChat_Client('Lambda');
-			});
+            require.config({
+                paths: {
+                    'jquery': 'js/jquery-1.11.1.min',
+                    'jquery-ui': 'js/jQueryUI/jquery-ui.min',
+                    'knockout': 'js/knockout-3.3.0',
+                    'viewmodel': 'js/gabeChatKo',
+                    'boot': 'js/bootstrap',
+                    'ace': 'js/src-noconflict/ace'
+                },
+                shim: {
+                    "jquery": {
+                        exports: "$"
+                    },
+                    "jquery-ui": {
+                        deps: ['jquery']
+                    },
+                    "boot": {
+                        deps: ['jquery']
+                    }
+                },
+            })
+            require(
+                [
+                    'jquery',
+                    'jquery-ui',
+                    'knockout',
+                    'viewmodel',
+                    'boot',
+                    'ace',
+                ],
+                function ($, jqueryui, ko, gabe) {
+
+                    var viewModel = new gabe.ViewModel($, ko);
+
+                    // Bind to page.
+                    ko.applyBindings(viewModel, document.getElementById("theBodyOfGabe"));
+
+                    //init page
+                    viewModel.fn.construct();
+                }
+            );
+        
 			
 		</script>
 	</body>
