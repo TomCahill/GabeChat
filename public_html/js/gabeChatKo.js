@@ -15,9 +15,10 @@ define(function () {
         self.jSelector = "#theBodyOfGabe";
         self.chat_users = [];
         self.appTitle = ko.observable(name || 'GabeChat');
+        self.msgPrefix = ko.observable('/all');
+        self.msgText = ko.observable('');
 
         //flags
-
         self.isFocused = ko.observable(false);
         self.lostFocusCount = ko.observable(0);
         self.isSilentClient = ko.observable(false);
@@ -81,13 +82,13 @@ define(function () {
 
             // Input
             $('.chat-input-wrapper input').on('input propertychange paste', function (e) {
-                self.sockets.fn.checkStrForCommand($('.chat-input-wrapper input').val());
+                self.sockets.fn.checkStrForCommand(self.msgText());
             });
             $('.chat-input-wrapper').submit(function (e) {
                 e.preventDefault();
-                self.sockets.fn.preEmitMessage($('.chat-input-wrapper input').val());
+                self.sockets.fn.preEmitMessage(self.msgText());
                 self.fn.setChatInputPrefix('/all');
-                $('.chat-input-wrapper input').val('');
+                self.msgText('');
                 return false;
             });
         }
@@ -109,7 +110,7 @@ define(function () {
         }
 
         self.fn.setChatInputPrefix = function(prefix){
-            $('.chat-target').text(prefix);
+            self.msgPrefix(prefix);
             self.fn.resizeChatInput();
         }
 
@@ -328,7 +329,7 @@ define(function () {
                     if (typeof arguments[0] != 'undefined' && arguments[0].length > 0) {
                         var command = '/' + arguments[0];
                         if (self.AvailableCommands.indexOf(command) >= 0) {
-                            $('.chat-input-wrapper input').val($('.chat-input-wrapper input').val().replace(command, '').trim());
+                            self.msgText(self.msgText().replace(command, '').trim());
                             self.fn.setChatInputPrefix(command);
                         }
                     }
@@ -337,7 +338,7 @@ define(function () {
         }
 
         self.sockets.fn.preEmitMessage = function (msg) {
-            self.sockets.fn.messageEmit($('.chat-target').text() + ' ' + $('.chat-input-wrapper input').val());
+            self.sockets.fn.messageEmit($('.chat-target').text() + ' ' + self.msgText());
         }
 
         self.sockets.fn.messageEmit = function (message) {
