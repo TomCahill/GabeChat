@@ -1,11 +1,11 @@
 require.config({
     paths: {
-        'jquery': 'jquery-1.11.1.min',
-        'jquery-ui': 'jQueryUI/jquery-ui.min',
-        'knockout': 'knockout-3.3.0',
+        'jquery': 'Libs/jquery-1.11.1.min',
+        'jquery-ui': 'Libs/jQueryUI/jquery-ui.min',
+        'knockout': 'Libs/knockout-3.3.0',
         'viewmodel': 'gabeChatKo',
-        'boot': 'bootstrap',
-        'ace': 'src-noconflict/ace'
+        'boot': 'Libs/bootstrap',
+        'ace': 'Libs/src-noconflict/ace'
     },
     shim: {
         "jquery": {
