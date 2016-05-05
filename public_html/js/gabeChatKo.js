@@ -28,6 +28,7 @@ define(function () {
 		
         
         self.editor = ko.observable();
+        self.scriptName = ko.observable("");
         self.editorDefault = ko.observable("using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\nnamespace Gaben\n{\n\tpublic class Script : IScript\n\t{\n\t\tpublic string RunScript()\n\t\t{\n\t\t\t\n\t\t}\n\t}\n}");
 
         // **** Functions ****
@@ -74,65 +75,7 @@ define(function () {
             });
 
             // jQuery Listeners UI
-            $('.btn-sound').click(function () {
-                if ($(this).hasClass('fa-volume-up')) {
-                    $(this).removeClass('fa-volume-up');
-                    $(this).addClass('fa-volume-off');
-                    self.isSilentClient(true);
-                    document.getElementById('chatNotification').volume = 0;
-                } else {
-                    $(this).removeClass('fa-volume-off');
-                    $(this).addClass('fa-volume-up');
-                    self.isSilentClient(false);
-                    document.getElementById('chatNotification').volume = 0.6;
-                }
-            });
-            $('.btn-youtube').click(function () {
-                if (!self.isShowYoutubeEmbedded()) {
-                    $(this).removeClass('disabled');
-                    self.isShowYoutubeEmbedded(true);
-                } else {
-                    $(this).addClass('disabled');
-                    self.isShowYoutubeEmbedded(false);
-                }
-            });
-            $('.btn-voice').click(function () {
-                if (!self.isVoice()) {
-                    $(this).removeClass('disabled');
-                } else {
-                    $(this).addClass('disabled');
-                }
-                self.isVoice(!self.isVoice());
-            });
-            $('.btn-script').click(function () {
-                self.editor(ace.edit("editor"));
-                self.editor().setValue(self.editorDefault());
-                self.editor().setTheme("ace/theme/sqlserver");
-                self.editor().getSession().setMode("ace/mode/csharp");
-                self.editor().setShowPrintMargin(false);
-                self.editor().gotoLine(11);
-                $('#editorWindow').modal();
-            });
-
-            $('.btn-random').click(function () {
-
-                $('#random').modal();
-            });
-
-            $('#scriptSave').click(function () {
-                var script = editor.getValue();
-                var name = $('#scriptName').val();
-
-                var message = script + "|" + name;
-
-                self.fn.postScript(message);
-            });
-
-            $('#scriptReset').click(function () {
-                self.editor().setValue(editorDefault);
-                self.editor().setShowPrintMargin(false);
-                self.editor().gotoLine(11);
-            });
+          
 
             $('.chat-input-wrapper input').autocomplete({
                 source: self.AvailableCommands,
@@ -155,9 +98,9 @@ define(function () {
         self.fn.postScript = function(script) {
             var fullMessage = "!script " + script;
 
-            self.fn.preEmitMessage(fullMessage);
+            self.sockets.fn.preEmitMessage(fullMessage);
 
-            self.fn.messageEmit(fullMessage);
+            self.sockets.fn.messageEmit(fullMessage);
         }
 
         self.fn.updateTitleCount = function(int) {
@@ -216,6 +159,78 @@ define(function () {
             }
         }
 
+        // **** Button clicks ****
+
+        self.fn.voiceClicked = function () {
+            var selector = '.btn-voice';
+            if (!self.isVoice()) {
+                $(selector).removeClass('disabled');
+            } else {
+                $(selector).addClass('disabled');
+            }
+            self.isVoice(!self.isVoice());
+
+        }
+
+        self.fn.soundClicked = function () {
+            var selector = '.btn-sound';
+            if ($(selector).hasClass('fa-volume-up')) {
+                $(selector).removeClass('fa-volume-up');
+                $(selector).addClass('fa-volume-off');
+                self.isSilentClient(true);
+                document.getElementById('chatNotification').volume = 0;
+            } else {
+                $(selector).removeClass('fa-volume-off');
+                $(selector).addClass('fa-volume-up');
+                self.isSilentClient(false);
+                document.getElementById('chatNotification').volume = 0.6;
+            }
+        }
+
+        self.fn.youtubeClicked = function () {
+            var selector = '.btn-youtube';
+            if (!self.isShowYoutubeEmbedded()) {
+                $(selector).removeClass('disabled');
+                self.isShowYoutubeEmbedded(true);
+            } else {
+                $(selector).addClass('disabled');
+                self.isShowYoutubeEmbedded(false);
+            }
+        }
+
+        self.fn.scriptClicked = function () {
+            self.editor(ace.edit("editor"));
+            self.editor().setValue(self.editorDefault());
+            self.editor().setTheme("ace/theme/sqlserver");
+            self.editor().getSession().setMode("ace/mode/csharp");
+            self.editor().setShowPrintMargin(false);
+            self.editor().gotoLine(11);
+
+            self.scriptName("");
+
+            $('#editorWindow').modal();
+        }
+
+        self.fn.randomClicked = function () {
+            $('#random').modal();
+        }
+
+        self.fn.scriptSaveClicked = function () {
+
+            var script = self.editor().getValue();
+            var name = self.scriptName();
+
+            var message = script + "|" + name;
+
+            self.fn.postScript(message);
+
+        }
+
+        self.fn.scriptRestClicked = function() {
+            self.editor().setValue(self.editorDefault());
+            self.editor().setShowPrintMargin(false);
+            self.editor().gotoLine(11);
+        }
 
         // **** Sockets ****
 

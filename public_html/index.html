@@ -17,11 +17,11 @@
 			<div class="chat-userlist">
 				<ul></ul>
 				<div class="chat-userlist-icons">
-					<i class="btn-youtube fa fa-youtube"></i>
-                    <i class="btn-voice fa fa-thumbs-up disabled"></i>
-					<i class="btn-sound fa fa-volume-up"></i>
-					<i class="btn-script fa fa-file-code-o"></i>
-                    <i class="btn-random fa fa-question"></i>
+                    <i class="btn-youtube fa fa-youtube" data-bind="click:fn.youtubeClicked"></i>
+                    <i class="btn-voice fa fa-comment disabled" data-bind="click:fn.voiceClicked"></i>
+                    <i class="btn-sound fa fa-volume-up" data-bind="click:fn.soundClicked"></i>
+                    <i class="btn-script fa fa-file-code-o" data-bind="click:fn.scriptClicked"></i>
+                    <i class="btn-random fa fa-question" data-bind="click:fn.randomClicked"></i>
 				</div>
 			</div>
 			<div class="chat-window">
@@ -49,9 +49,9 @@
 			  </div>
 			  <div class="modal-footer">
 			    <label>Name</label>
-				<input type="text" id="scriptName"/>
-				<button id="scriptSave" class="btn btn-primary"> <i class="fa fa-save"></i> Save</button>
-				<button id="scriptReset" class="btn btn-danger"> <i class="fa fa-refresh"></i> Reset</button>
+				<input type="text" id="scriptName" data-bind="value:scriptName"/>
+                <button id="scriptSave" class="btn btn-primary" data-bind="click:fn.scriptSaveClicked"> <i class="fa fa-save"></i> Save</button>
+                <button id="scriptReset" class="btn btn-danger" data-bind="click:fn.scriptRestClicked"> <i class="fa fa-refresh"></i> Reset</button>
 			  </div>
 			</div>
 		  </div>
@@ -116,8 +116,6 @@
                     viewModel.fn.construct();
                 }
             );
-        
-			
 		</script>
 	</body>
 </html>
