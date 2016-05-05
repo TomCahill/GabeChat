@@ -16,13 +16,16 @@ define(function () {
         self.chat_users = [];
         self.appTitle = ko.observable(name || 'GabeChat');
 
+        //flags
+
         self.isFocused = ko.observable(false);
         self.lostFocusCount = ko.observable(0);
         self.isSilentClient = ko.observable(false);
         self.isVoice = ko.observable(false);
         self.isShowYoutubeEmbedded = ko.observable(true);
-
         self.CommandListFirstLoad = ko.observable(false);
+
+        //command arrays
         self.ServerCommands = [];
         self.AvailableCommands = [];
 		
@@ -69,14 +72,8 @@ define(function () {
                self.isFocused(false);
             });
 
-            $('.chat-wrapper').click(function () {
-                if (!self.isFocused())
-                    $(window).triggerHandler('focus');
-            });
-
             // jQuery Listeners UI
           
-
             $('.chat-input-wrapper input').autocomplete({
                 source: self.AvailableCommands,
                 position: { my: "left bottom", at: "left top", collision: "flip" }
@@ -159,7 +156,7 @@ define(function () {
             }
         }
 
-        // **** Button clicks ****
+        // **** clicks ****
 
         self.fn.voiceClicked = function () {
             var selector = '.btn-voice';
@@ -230,6 +227,11 @@ define(function () {
             self.editor().setValue(self.editorDefault());
             self.editor().setShowPrintMargin(false);
             self.editor().gotoLine(11);
+        }
+
+        self.fn.triggerHandle = function () {
+            if (!self.isFocused())
+                $(window).triggerHandler('focus');
         }
 
         // **** Sockets ****
