@@ -21,7 +21,7 @@
                 <i class="btn-voice fa fa-comment disabled" data-bind="click:fn.voiceClicked"></i>
                 <i class="btn-sound fa fa-volume-up" data-bind="click:fn.soundClicked"></i>
                 <i class="btn-script fa fa-file-code-o" data-bind="click:fn.scriptClicked"></i>
-                <i class="btn-random fa fa-question" data-bind="click:fn.randomClicked"></i>
+                <i class="btn-random fa fa-music" data-bind="click:fn.randomClicked"></i>
             </div>
         </div>
         <div class="chat-window">
@@ -64,7 +64,7 @@
             </div>
             <div class="modal-body">
                 <div id="video-placeholder"></div>
-                <p data-bind="text: current.Title()"></p>
+                <p data-bind="text: current"></p>
 <!--                <img data-bind="attr: {src:thumb}"/>-->
                 <input type="range" id="progress-bar" data-bind="value: progress, slider: progress" />
                 <button id="previous" class="btn btn-default" data-bind="click:fn.previous"> <i class="fa fa-backward"></i></button>
@@ -73,6 +73,13 @@
                 <button id="next" class="btn btn-default" data-bind="click:fn.next"> <i class="fa fa-forward"></i></button>
             </div>
             
+            <label style="margin-left:30px;">Url</label>
+            <input type="text" id="urlLabel" data-bind="value:url" />
+            <button id="Button1" class="btn btn-primary" data-bind="click:fn.addClicked"> <i class="fa fa-plus"></i> Add</button>
+            <div data-bind="foreach:playList" id="playlist">
+                <p data-bind="text:Title"></p>
+            </div>
+           
         </div>
     <audio id="chatNotification" src="audio/notification.wav" preload="auto"></audio>
 </body>

@@ -176,6 +176,8 @@ body{
 	height:500px;
     width:600px;
     overflow:hidden;
+    margin-left:500px;
+    margin-top:50px;
 }
 
 #editor {
@@ -191,6 +193,24 @@ body{
 
 #progress-bar {
     margin-bottom:10px;
+}
+
+#playlist {
+
+    margin-top:10px;
+    margin-bottom:10px;
+
+}
+#playlist p{
+    width:500px;
+    border:1px solid black;
+    text-align:center;
+    padding:5px;
+    margin-left:50px;
+}
+
+#urlLabel{
+    width:400px;
 }
 
 

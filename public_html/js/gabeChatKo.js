@@ -376,7 +376,9 @@ define(function () {
         self.player.paused = ko.observable(true);
         self.player.index;
         self.player.progress = ko.observable(0);
-        self.player.current = ko.observable();
+        self.player.current = ko.observable("");
+        self.player.url = ko.observable("");
+      
         self.player.fn = {};
 
         self.player.fn.init = function () {
@@ -402,15 +404,13 @@ define(function () {
 
             self.player.index = 0;
             self.player.fn.add("yGCOKEmkY40");
-            self.player.fn.add("DurcdkTvO3c");
-            self.player.fn.add("9vx69Pe7Ncs");
-            self.player.fn.add("oXwrFZmIuAY");
            
             setTimeout(function () {
                 setInterval(function () {
                     self.player.fn.getTime();
                 }, 1000);
                 self.player.fn.playVideo(self.player.playList()[0]);
+                self.player.current(self.player.playList()[0].Title());
             }, 1000);
 
             $('#progress-bar').on('mouseup touchend', function (e) {
@@ -460,19 +460,32 @@ define(function () {
         }
 
         self.player.fn.playVideo = function (item) {
+            self.player.current(item.Title());
             self.player.progress(0);
             self.player.player.loadVideoById(item.Id());
             self.player.paused(false);
+
+        }
+
+        self.player.fn.addClicked = function () {
+ 
+            var id = self.player.url().split("=")[1];
+
+            console.log(id);
+
+            self.player.fn.add(id);
+
+            self.player.url("");
         }
 
         self.player.fn.add = function (url) {
             var data = {};
             data.Id = url;
             data.Thumb = "http://img.youtube.com/vi/" + url + "/1.jpg";
-            self.player.fn.getInfo(item, function (d) {
-                data.Title(d);
+            self.player.fn.getInfo(url, function (d) {
+                data.Title = d;
                 var song = new Model.Song(ko, data);
-                self.player.playList.push(song)
+                self.player.playList.push(song);
             });
            
         }

@@ -1,6 +1,5 @@
 {
-  "name": "nodeChat",
-  "description": "",
+  "name": "gabechat",
   "version": "0.0.2",
   "private": true,
   "dependencies": {
@@ -8,5 +7,20 @@
     "node-uuid": "^1.4.1",
     "socket.io": "*",
     "extend": "*"
-  }
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/James-Goodbourn/GabeChat.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/James-Goodbourn/GabeChat/issues"
+  },
+  "homepage": "https://github.com/James-Goodbourn/GabeChat#readme",
+  "description": ""
 }

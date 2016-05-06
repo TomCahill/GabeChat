@@ -12,7 +12,7 @@ define(function () {
         // Friendly reference to this.
         var self = this;
 
-        self.Id = ko.observableArray(data.Id);
+        self.Id = ko.observable(data.Id);
         self.Thumb = ko.observable(data.Thumb);
         self.Title = ko.observable(data.Title);
 
