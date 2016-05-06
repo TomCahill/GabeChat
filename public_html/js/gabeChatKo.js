@@ -376,8 +376,7 @@ define(function () {
         self.player.paused = ko.observable(true);
         self.player.index;
         self.player.progress = ko.observable(0);
-        self.player.thumb = ko.observable("");
-        self.player.current = ko.observable("");
+        self.player.current = ko.observable();
         self.player.fn = {};
 
         self.player.fn.init = function () {
@@ -402,10 +401,10 @@ define(function () {
             document.getElementById("video-placeholder").style.display = "none";
 
             self.player.index = 0;
-            self.player.playList.push("yGCOKEmkY40");
-            self.player.playList.push("DurcdkTvO3c");
-            self.player.playList.push("9vx69Pe7Ncs");
-            self.player.playList.push("oXwrFZmIuAY");
+            self.player.fn.add("yGCOKEmkY40");
+            self.player.fn.add("DurcdkTvO3c");
+            self.player.fn.add("9vx69Pe7Ncs");
+            self.player.fn.add("oXwrFZmIuAY");
            
             setTimeout(function () {
                 setInterval(function () {
@@ -462,14 +461,21 @@ define(function () {
 
         self.player.fn.playVideo = function (item) {
             self.player.progress(0);
-            self.player.thumb("http://img.youtube.com/vi/"+ item +"/1.jpg");
-            self.player.player.loadVideoById(item);
-            self.player.fn.getInfo(item, function (data) { 
-                self.player.current(data);
-            });
+            self.player.player.loadVideoById(item.Id());
             self.player.paused(false);
         }
 
+        self.player.fn.add = function (url) {
+            var data = {};
+            data.Id = url;
+            data.Thumb = "http://img.youtube.com/vi/" + url + "/1.jpg";
+            self.player.fn.getInfo(item, function (d) {
+                data.Title(d);
+                var song = new Model.Song(ko, data);
+                self.player.playList.push(song)
+            });
+           
+        }
         
     };
 

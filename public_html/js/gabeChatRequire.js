@@ -4,6 +4,7 @@ require.config({
         'jquery-ui': 'Libs/jQueryUI/jquery-ui.min',
         'knockout': 'Libs/knockout-3.3.0',
         'viewmodel': 'gabeChatKo',
+        'model':'Models',
         'boot': 'Libs/bootstrap',
         'ace': 'Libs/src-noconflict/ace'
     },
@@ -24,7 +25,8 @@ require(
         'jquery',
         'jquery-ui',
         'knockout',
-        'viewmodel',
+        'viewmodel', ,
+        'model',
         'boot',
         'ace',
     ],
