@@ -376,6 +376,8 @@ define(function () {
         self.player.paused = ko.observable(true);
         self.player.index;
         self.player.progress = ko.observable(0);
+        self.player.thumb = ko.observable("");
+        self.player.current = ko.observable("");
         self.player.fn = {};
 
         self.player.fn.init = function () {
@@ -406,47 +408,69 @@ define(function () {
             self.player.playList.push("oXwrFZmIuAY");
            
             setTimeout(function () {
-                self.player.player.loadVideoById(self.player.playList()[self.player.index]);
-                self.player.paused(false);
                 setInterval(function () {
                     self.player.fn.getTime();
                 }, 1000);
+                self.player.fn.playVideo(self.player.playList()[0]);
             }, 1000);
 
-            
+            $('#progress-bar').on('mouseup touchend', function (e) {
+
+                var newTime = self.player.player.getDuration() * (e.target.value / 100);
+
+                self.player.player.seekTo(newTime);
+
+            });
             
         };
+
         self.player.fn.getTime = function () {
             self.player.progress((self.player.player.getCurrentTime() / self.player.player.getDuration()) * 100);
+            if (self.player.player.getPlayerState() == 0)  {
+                self.player.fn.next();
+            }
         }
 
         self.player.fn.play = function () {
-            self.player.paused(false);
             self.player.player.playVideo();
+            self.player.paused(false);
         };
+
         self.player.fn.pause = function () {
             self.player.paused(true);
             self.player.player.pauseVideo();
         };
+
         self.player.fn.previous = function () {
             self.player.index--;
-            if (self.player.index < 0) { self.player.index = 0; }
-            self.player.player.loadVideoById(self.player.playList()[self.player.index]);
-            self.player.paused(false);
-        };
-        self.player.fn.next = function () {
-            self.player.index++;
-            if (self.player.index == self.player.playList().length) { self.player.index = self.player.playList().length - 1; }
-            self.player.player.loadVideoById(self.player.playList()[self.player.index]);
-            self.player.paused(false);
+            if (self.player.index < 0) { self.player.index = self.player.playList().length - 1; }
+            self.player.fn.playVideo(self.player.playList()[self.player.index]);
         };
 
-        self.player.fn.getInfo = function (item) {
-            $.getJSON('https://www.googleapis.com/youtube/v3/videos?id=' + self.player.playList()[self.player.index] + '&key=AIzaSyD1UscDO8vuEDYvoVLhMCB1DQ-HAd-6GEo&part=snippet&callback=?', function (data) {
-                return data.items[0].snippet.title;
+        self.player.fn.next = function () {
+            self.player.index++;
+            if (self.player.index == self.player.playList().length) { self.player.index = 0; }
+            self.player.fn.playVideo(self.player.playList()[self.player.index]);
+        };
+
+        self.player.fn.getInfo = function (item, callback) {
+            $.getJSON('https://www.googleapis.com/youtube/v3/videos?id=' + item + '&key=AIzaSyD1UscDO8vuEDYvoVLhMCB1DQ-HAd-6GEo&part=snippet&callback=?', function (data) {
+                var title = data.items[0].snippet.title;
+                callback(title);
             });
         }
 
+        self.player.fn.playVideo = function (item) {
+            self.player.progress(0);
+            self.player.thumb("http://img.youtube.com/vi/"+ item +"/1.jpg");
+            self.player.player.loadVideoById(item);
+            self.player.fn.getInfo(item, function (data) { 
+                self.player.current(data);
+            });
+            self.player.paused(false);
+        }
+
+        
     };
 
     return Gabe;

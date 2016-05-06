@@ -64,6 +64,8 @@
             </div>
             <div class="modal-body">
                 <div id="video-placeholder"></div>
+                <p data-bind="text: current"></p>
+                <img data-bind="attr: {src:thumb}"/>
                 <input type="range" id="progress-bar" data-bind="value: progress, slider: progress" />
                 <button id="previous" class="btn btn-default" data-bind="click:fn.previous"> <i class="fa fa-backward"></i></button>
                 <button id="play" class="btn btn-default" data-bind="click:fn.play, visible:paused"> <i class="fa fa-play"></i></button>
