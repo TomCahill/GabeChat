@@ -15,7 +15,7 @@ define(function () {
         self.Id = ko.observable(data.Id);
         self.Thumb = ko.observable(data.Thumb);
         self.Title = ko.observable(data.Title);
-
+        self.playing = ko.observable(false);
     };
 
     return Model;

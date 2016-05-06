@@ -173,7 +173,7 @@ body{
 }
 
 #random{
-	height:500px;
+	height:600px;
     width:600px;
     overflow:hidden;
     margin-left:500px;
@@ -201,18 +201,34 @@ body{
     margin-bottom:10px;
 
 }
-#playlist p{
+    .scrollable{
+        overflow-y:scroll;
+        height:320px;
+    }
+.title{
     width:500px;
-    border:1px solid black;
     text-align:center;
     padding:5px;
-    margin-left:50px;
+    margin-left:10px;
+   
+}
+.thumb{
+    width:30px;
+    height:30px;
+    margin-left:10px;
 }
 
 #urlLabel{
     width:400px;
 }
 
+.playlistRemove{
+    margin-left:10px;
+}
+
+.isPLaying{
+
+}
 
 
 @media only screen and (max-width: 767px) {
