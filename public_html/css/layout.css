@@ -133,12 +133,13 @@ body{
 .chat-wrapper .chat-userlist-icons{
 	position: absolute;
 	bottom: 50px;
-	right: 10px;
+	right: 0px;
+	width: 95%;
 }
 .chat-wrapper .chat-userlist-icons i{
 	cursor: pointer;
-	font-size: 26px;
-	width: 26px;
+    font-size: 24px;
+    width: 24px;
 }
 .chat-wrapper .chat-userlist-icons i.disabled{
 	color: #616161;
